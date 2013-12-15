@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/TakeTeaWithTuring.iml" filepath="$PROJECT_DIR$/TakeTeaWithTuring.iml" />
+      <module fileurl="file://$PROJECT_DIR$/TeaWithTuring/TeaWithTuring.iml" filepath="$PROJECT_DIR$/TeaWithTuring/TeaWithTuring.iml" />
+    </modules>
+  </component>
+</project>
+

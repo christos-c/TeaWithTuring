@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:id="@+id/audio_container"
+    android:layout_width="fill_parent"
+    android:layout_height="0dp"
+    android:layout_weight="1"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:gravity="center_horizontal|bottom">
+
+    <ProgressBar
+        android:id="@+id/audio_loading_indicator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <TableLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="horizontal"
+        android:stretchColumns="1">
+        <TableRow>
+            <ImageView
+                android:id="@+id/imagePlayPause"
+                android:src="@drawable/ic_action_play"
+                android:contentDescription="@string/image_descriptor_play" />
+
+            <SeekBar
+                android:id="@+id/seekBar" />
+
+            <ImageView
+                android:id="@+id/buttonDownload"
+                android:src="@drawable/ic_action_download"
+                android:contentDescription="@string/image_descriptor_download" />
+        </TableRow>
+    </TableLayout>
+
+
+</LinearLayout>
