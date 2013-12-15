@@ -56,12 +56,14 @@ public class StoryDetailFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         retrieveTextTask = new RetrieveTextTask();
-        audioFragment = new StoryAudioFragment();
-        Bundle args = new Bundle();
-        args.putString(Story.ARG_AUDIO_URL, Story.mAudioURL);
-        args.putString(Story.ARG_AUDIO_LOCAL, Story.mAudioLocal);
-        args.putString(Story.ARG_STORY_ID, Story.mStoryID);
-        audioFragment.setArguments(args);
+        if (Story.exists(Story.mAudioURL, Story.mAudioLocal)) {
+            audioFragment = new StoryAudioFragment();
+            Bundle args = new Bundle();
+            args.putString(Story.ARG_AUDIO_URL, Story.mAudioURL);
+            args.putString(Story.ARG_AUDIO_LOCAL, Story.mAudioLocal);
+            args.putString(Story.ARG_STORY_ID, Story.mStoryID);
+            audioFragment.setArguments(args);
+        }
     }
 
     @Override
@@ -71,11 +73,13 @@ public class StoryDetailFragment extends Fragment {
         TextView textView = (TextView) rootView.findViewById(R.id.story_detail);
         scrollView = (ScrollView) rootView.findViewById(R.id.story_scroller);
         FragmentManager fragmentManager = getFragmentManager();
-        Fragment f = fragmentManager.findFragmentByTag(audioFragmentTag);
-        if (f == null) {
-            FragmentTransaction transaction = getFragmentManager().beginTransaction();
-            transaction.add(R.id.story_detail_container, audioFragment, audioFragmentTag);
-            transaction.commit();
+        if (Story.exists(Story.mAudioURL, Story.mAudioLocal)) {
+            Fragment f = fragmentManager.findFragmentByTag(audioFragmentTag);
+            if (f == null) {
+                FragmentTransaction transaction = getFragmentManager().beginTransaction();
+                transaction.add(R.id.story_detail_container, audioFragment, audioFragmentTag);
+                transaction.commit();
+            }
         }
         String localStoryText;
         if (savedInstanceState != null || savedState != null) {

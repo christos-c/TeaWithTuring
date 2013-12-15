@@ -36,7 +36,7 @@
                 android:value=".StoryList" />
         </activity>
         <activity
-            android:name="com.christosc.teawithturing.StoryScanActivity"
+            android:name=".storyScan.StoryScanActivity"
             android:label="@string/action_scan"
             android:parentActivityName=".StoryList" >
             <meta-data

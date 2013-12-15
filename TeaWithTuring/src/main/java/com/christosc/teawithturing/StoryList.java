@@ -8,7 +8,6 @@ import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -21,6 +20,7 @@ import android.widget.SimpleCursorAdapter;
 
 import com.christosc.teawithturing.data.StoriesDatabase;
 import com.christosc.teawithturing.data.StoriesProvider;
+import com.christosc.teawithturing.storyScan.StoryScanActivity;
 
 public class StoryList extends ListActivity implements LoaderManager.LoaderCallbacks<Cursor> {
     // This is the Adapter being used to display the list's data

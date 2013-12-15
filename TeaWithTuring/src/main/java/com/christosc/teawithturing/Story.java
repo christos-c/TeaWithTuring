@@ -13,6 +13,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 public class Story extends Activity implements ActionBar.TabListener {
@@ -41,9 +43,24 @@ public class Story extends Activity implements ActionBar.TabListener {
     public static final String ARG_AUDIO_LOCAL = "audio_local";
     public static final String ARG_VIDEO_URL = "video_url";
     public static final String ARG_VIDEO_LOCAL = "video_local";
+    public static final String ARG_ESSAY_URL = "essay_url";
+    public static final String ARG_ESSAY_LOCAL = "essay_local";
+    public static final String ARG_BIO_URL = "bio_url";
+    public static final String ARG_BIO_LOCAL = "bio_local";
 
     protected static String mStoryID, mStoryTitle, mTextURL, mTextLocal,
-            mAudioURL, mAudioLocal, mVideoURL, mVideoLocal;
+            mAudioURL, mAudioLocal, mVideoURL, mVideoLocal, mEssayURL, mEssayLocal,
+            mBioURL, mBioLocal;
+
+    /**
+     * The integers corresponding to the different tabs of the story
+     */
+    private static final int TAB_TEXT = 0;
+    private static final int TAB_VIDEO = 1;
+    private static final int TAB_ESSAY = 2;
+    private static final int TAB_BIO = 3;
+
+    private static List<Integer> activeTabs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,8 +75,19 @@ public class Story extends Activity implements ActionBar.TabListener {
         //TODO Change this to getData
         mVideoURL = "http://www.christos-c.com/test/video.mp4";
         mVideoLocal = null;
+        mEssayURL = null;
+        mEssayLocal = null;
+        mBioURL = null;
+        mBioLocal = null;
 
         setTitle(mStoryTitle);
+
+        // Check which tabs should be active
+        activeTabs = new ArrayList<Integer>();
+        if (exists(mTextURL, mTextLocal)) activeTabs.add(TAB_TEXT);
+        if (exists(mVideoURL, mVideoLocal)) activeTabs.add(TAB_VIDEO);
+        if (exists(mEssayURL, mEssayLocal)) activeTabs.add(TAB_ESSAY);
+        if (exists(mBioURL, mBioLocal)) activeTabs.add(TAB_BIO);
 
         // Set up the action bar.
         final ActionBar actionBar = getActionBar();
@@ -78,22 +106,27 @@ public class Story extends Activity implements ActionBar.TabListener {
         mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
             public void onPageSelected(int position) {
-                if (position == 1) StoryVideoFragment.showVideo();
+                if (position == TAB_VIDEO) StoryVideoFragment.showVideo();
                 actionBar.setSelectedNavigationItem(position);
             }
         });
 
         // For each of the sections in the app, add a tab to the action bar.
-        for (int i = 0; i < mSectionsPagerAdapter.getCount(); i++) {
+        for (int position : activeTabs) {
             // Create a tab with text corresponding to the page title defined by
             // the adapter. Also specify this Activity object, which implements
             // the TabListener interface, as the callback (listener) for when
             // this tab is selected.
             actionBar.addTab(
                     actionBar.newTab()
-                            .setText(mSectionsPagerAdapter.getPageTitle(i))
+                            .setText(mSectionsPagerAdapter.getPageTitle(position))
                             .setTabListener(this));
         }
+    }
+
+    protected static boolean exists(String argURL, String argLocal) {
+        return ((argURL != null && !argURL.isEmpty()) ||
+                (argLocal != null && !argLocal.isEmpty()));
     }
 
     @Override
@@ -105,6 +138,7 @@ public class Story extends Activity implements ActionBar.TabListener {
         outBundle.putString(ARG_TEXT_URL, mTextURL);
         outBundle.putString(ARG_AUDIO_URL, mAudioURL);
         outBundle.putString(ARG_AUDIO_LOCAL, mAudioLocal);
+        //TODO add essay and bio
     }
 
     @Override
@@ -116,6 +150,7 @@ public class Story extends Activity implements ActionBar.TabListener {
         mTextURL = getData(ARG_TEXT_URL, savedInstanceState);
         mAudioURL = getData(ARG_AUDIO_URL, savedInstanceState);
         mAudioLocal = getData(ARG_AUDIO_LOCAL, savedInstanceState);
+        //TODO add essay and bio
     }
 
     private String getData(String name, Bundle savedInstanceState){
@@ -151,11 +186,12 @@ public class Story extends Activity implements ActionBar.TabListener {
 
         @Override
         public Fragment getItem(int position) {
+            //TODO change this to activeTabs
             // getItem is called to instantiate the fragment for the given page.
-            if (position == 0) {
+            if (position == TAB_TEXT) {
                 return StoryDetailFragment.newInstance();
             }
-            else if (position == 1) {
+            else if (position == TAB_VIDEO) {
                 return StoryVideoFragment.newInstance();
             }
             else
@@ -167,21 +203,21 @@ public class Story extends Activity implements ActionBar.TabListener {
         @Override
         public int getCount() {
             // Show 4 total pages: Story, Video, Essay and Bio.
-            return 4;
+            return activeTabs.size();
         }
 
         @Override
         public CharSequence getPageTitle(int position) {
             Locale l = Locale.getDefault();
             switch (position) {
-                case 0:
-                    return getString(R.string.title_section1).toUpperCase(l);
-                case 1:
-                    return getString(R.string.title_section2).toUpperCase(l);
-                case 2:
-                    return getString(R.string.title_section3).toUpperCase(l);
-                case 3:
-                    return getString(R.string.title_section4).toUpperCase(l);
+                case TAB_TEXT:
+                    return getString(R.string.title_section_text).toUpperCase(l);
+                case TAB_VIDEO:
+                    return getString(R.string.title_section_video).toUpperCase(l);
+                case TAB_ESSAY:
+                    return getString(R.string.title_section_essay).toUpperCase(l);
+                case TAB_BIO:
+                    return getString(R.string.title_section_bio).toUpperCase(l);
             }
             return null;
         }

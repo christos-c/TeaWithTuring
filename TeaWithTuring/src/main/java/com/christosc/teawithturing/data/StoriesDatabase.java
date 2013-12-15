@@ -27,6 +27,10 @@ public final class StoriesDatabase extends SQLiteOpenHelper{
         public static final String COLUMN_LOCAL_TEXT = "localtext";
         public static final String COLUMN_LOCAL_AUDIO = "localaudio";
         public static final String COLUMN_LOCAL_VIDEO = "localvideo";
+        public static final String COLUMN_REMOTE_ESSAY = "remoteessay";
+        public static final String COLUMN_LOCAL_ESSAY = "localessay";
+        public static final String COLUMN_REMOTE_BIO = "remotebio";
+        public static final String COLUMN_LOCAL_BIO = "localbio";
     }
 
     private static final String TEXT_TYPE = " TEXT";
@@ -40,9 +44,13 @@ public final class StoriesDatabase extends SQLiteOpenHelper{
                     StoryEntry.COLUMN_REMOTE_TEXT + TEXT_TYPE + COMMA_SEP +
                     StoryEntry.COLUMN_REMOTE_AUDIO + TEXT_TYPE + COMMA_SEP +
                     StoryEntry.COLUMN_REMOTE_VIDEO + TEXT_TYPE + COMMA_SEP +
+                    StoryEntry.COLUMN_REMOTE_ESSAY + TEXT_TYPE + COMMA_SEP +
+                    StoryEntry.COLUMN_REMOTE_BIO + TEXT_TYPE + COMMA_SEP +
                     StoryEntry.COLUMN_LOCAL_TEXT + TEXT_TYPE + COMMA_SEP +
                     StoryEntry.COLUMN_LOCAL_AUDIO + TEXT_TYPE + COMMA_SEP +
-                    StoryEntry.COLUMN_LOCAL_VIDEO + TEXT_TYPE +
+                    StoryEntry.COLUMN_LOCAL_VIDEO + TEXT_TYPE + COMMA_SEP +
+                    StoryEntry.COLUMN_LOCAL_ESSAY + TEXT_TYPE + COMMA_SEP +
+                    StoryEntry.COLUMN_LOCAL_BIO + TEXT_TYPE +
                     " )";
 
     private static final String SQL_DELETE_ENTRIES =
@@ -66,12 +74,14 @@ public final class StoriesDatabase extends SQLiteOpenHelper{
     }
 
     public void seedData(SQLiteDatabase db){
+        //TODO Populate from file
         ContentValues values = new ContentValues();
         values.put(StoryEntry.COLUMN_TITLE,"Story about Turing's work #1");
         values.put(StoryEntry.COLUMN_AUTHOR,"Christos Christodouloupoulos");
         values.put(StoryEntry.COLUMN_STORY_TYPE,StoryEntry.TYPE_DESK);
         values.put(StoryEntry.COLUMN_REMOTE_TEXT,"http://christos-c.com/test/test.txt");
         values.put(StoryEntry.COLUMN_REMOTE_AUDIO,"http://christos-c.com/papers/entscheidungsproblem.mp3");
+        values.put(StoryEntry.COLUMN_REMOTE_ESSAY, "http://christos-c.com/test/test.txt");
         db.insert(StoryEntry.TABLE_NAME, null, values);
 
         values = new ContentValues();

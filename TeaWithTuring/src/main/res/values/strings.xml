@@ -3,10 +3,10 @@
 
     <string name="app_name">Take Tea With Turing</string>
     <string name="app_name_short">Tea With Turing</string>
-    <string name="title_section1">Story</string>
-    <string name="title_section2">Video</string>
-    <string name="title_section3">Essay</string>
-    <string name="title_section4">Bio</string>
+    <string name="title_section_text">Story</string>
+    <string name="title_section_video">Video</string>
+    <string name="title_section_essay">Essay</string>
+    <string name="title_section_bio">Bio</string>
     <string name="action_settings">Settings</string>
     <string name="action_scan">Scan Marker</string>
 
