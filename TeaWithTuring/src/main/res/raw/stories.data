@@ -1,0 +1,44 @@
+TITLE	Story about Turing'92s work #1
+AUTHOR	Christos Christodoulopoulos
+TYPE	desk
+TEXT	http://christos-c.com/test/test.txt
+AUDIO	http://christos-c.com/papers/entscheidungsproblem.mp3
+VIDEO	http://www.christos-c.com/test/video.mp4
+ESSAY	http://christos-c.com/test/test.txt
+BIO	
+
+TITLE	Story about Turing'92s work #2
+AUTHOR	Christos Christodoulopoulos
+TYPE	desk
+TEXT	http://christos-c.com/test/test.txt
+AUDIO	http://christos-c.com/papers/entscheidungsproblem.mp3
+VIDEO	http://www.christos-c.com/test/video.mp4
+ESSAY	
+BIO	
+
+TITLE	Story about Turing'92s work #3
+AUTHOR	Christos Christodoulopoulos
+TYPE	desk
+TEXT	http://christos-c.com/test/test.txt
+AUDIO	http://christos-c.com/papers/entscheidungsproblem.mp3
+VIDEO	http://www.christos-c.com/test/video.mp4
+ESSAY	
+BIO	http://christos-c.com/test/test.txt
+
+TITLE	Story about Turing'92s life #1
+AUTHOR	Christos Christodoulopoulos
+TYPE	trees
+TEXT	http://christos-c.com/test/test.txt
+AUDIO	http://christos-c.com/papers/entscheidungsproblem.mp3
+VIDEO	http://www.christos-c.com/test/video.mp4
+ESSAY	http://christos-c.com/test/test.txt
+BIO	
+
+TITLE	Story about Turing'92s life #2
+AUTHOR	Christos Christodoulopoulos
+TYPE	trees
+TEXT	
+AUDIO	
+VIDEO	http://www.christos-c.com/test/video.mp4
+ESSAY	http://christos-c.com/test/test.txt
+BIO	
