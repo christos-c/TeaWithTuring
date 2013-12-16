@@ -72,13 +72,12 @@ public class Story extends Activity implements ActionBar.TabListener {
         mTextURL = getData(ARG_TEXT_URL, savedInstanceState);
         mAudioURL = getData(ARG_AUDIO_URL, savedInstanceState);
         mAudioLocal = getData(ARG_AUDIO_LOCAL, savedInstanceState);
-        //TODO Change this to getData
-        mVideoURL = "http://www.christos-c.com/test/video.mp4";
-        mVideoLocal = null;
-        mEssayURL = null;
-        mEssayLocal = null;
-        mBioURL = null;
-        mBioLocal = null;
+        mVideoURL = getData(ARG_VIDEO_URL, savedInstanceState);
+        mVideoLocal = getData(ARG_VIDEO_LOCAL, savedInstanceState);
+        mEssayURL = getData(ARG_ESSAY_URL, savedInstanceState);
+        mEssayLocal = getData(ARG_ESSAY_LOCAL, savedInstanceState);
+        mBioURL = getData(ARG_BIO_URL, savedInstanceState);
+        mBioLocal = getData(ARG_BIO_LOCAL, savedInstanceState);
 
         setTitle(mStoryTitle);
 
@@ -138,7 +137,12 @@ public class Story extends Activity implements ActionBar.TabListener {
         outBundle.putString(ARG_TEXT_URL, mTextURL);
         outBundle.putString(ARG_AUDIO_URL, mAudioURL);
         outBundle.putString(ARG_AUDIO_LOCAL, mAudioLocal);
-        //TODO add essay and bio
+        outBundle.putString(ARG_VIDEO_URL, mVideoURL);
+        outBundle.putString(ARG_VIDEO_LOCAL, mVideoLocal);
+        outBundle.putString(ARG_ESSAY_URL, mEssayURL);
+        outBundle.putString(ARG_ESSAY_LOCAL, mEssayLocal);
+        outBundle.putString(ARG_BIO_URL, mBioURL);
+        outBundle.putString(ARG_BIO_LOCAL, mBioLocal);
     }
 
     @Override
@@ -150,7 +154,13 @@ public class Story extends Activity implements ActionBar.TabListener {
         mTextURL = getData(ARG_TEXT_URL, savedInstanceState);
         mAudioURL = getData(ARG_AUDIO_URL, savedInstanceState);
         mAudioLocal = getData(ARG_AUDIO_LOCAL, savedInstanceState);
-        //TODO add essay and bio
+        mVideoURL = getData(ARG_VIDEO_URL, savedInstanceState);
+        mVideoLocal = getData(ARG_VIDEO_LOCAL, savedInstanceState);
+        mEssayURL = getData(ARG_ESSAY_URL, savedInstanceState);
+        mEssayLocal = getData(ARG_ESSAY_LOCAL, savedInstanceState);
+        mBioURL = getData(ARG_BIO_URL, savedInstanceState);
+        mBioLocal = getData(ARG_BIO_LOCAL, savedInstanceState);
+
     }
 
     private String getData(String name, Bundle savedInstanceState){

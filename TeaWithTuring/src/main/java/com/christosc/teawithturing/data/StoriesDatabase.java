@@ -18,6 +18,7 @@ public final class StoriesDatabase extends SQLiteOpenHelper{
     // If you change the database schema, you must increment the database version.
     public static final int DATABASE_VERSION = 1;
     public static final String DATABASE_NAME = "Stories.db";
+    private static Context appContext;
 
     public static abstract class StoryEntry implements BaseColumns {
         public static final String TABLE_NAME = "stories";
@@ -66,6 +67,7 @@ public final class StoriesDatabase extends SQLiteOpenHelper{
 
     public StoriesDatabase(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        appContext = context;
     }
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(SQL_CREATE_ENTRIES);
@@ -83,7 +85,7 @@ public final class StoriesDatabase extends SQLiteOpenHelper{
 
     public void seedData(SQLiteDatabase db){
         InputStream inputStream;
-        inputStream = Resources.getSystem().openRawResource(R.raw.stories);
+        inputStream = appContext.getResources().openRawResource(R.raw.stories);
         BufferedReader in = new BufferedReader(new InputStreamReader(inputStream));
         String line;
         ContentValues values = new ContentValues();
@@ -98,21 +100,22 @@ public final class StoriesDatabase extends SQLiteOpenHelper{
                 else {
                     String[] splits = line.split("\t");
                     String key = splits[0];
-                    if (key.equals("TITLE"))
+                    String value = (splits.length > 1 ? splits[1] : null);
+                    if (key.equals("TITLE") && value != null)
                         values.put(StoryEntry.COLUMN_TITLE, splits[1]);
-                    else if (key.equals("AUTHOR"))
+                    else if (key.equals("AUTHOR") && value != null)
                         values.put(StoryEntry.COLUMN_AUTHOR, splits[1]);
-                    else if (key.equals("TYPE"))
+                    else if (key.equals("TYPE") && value != null)
                         values.put(StoryEntry.COLUMN_STORY_TYPE, splits[1]);
-                    else if (key.equals("TEXT"))
+                    else if (key.equals("TEXT") && value != null)
                         values.put(StoryEntry.COLUMN_REMOTE_TEXT, splits[1]);
-                    else if (key.equals("AUDIO"))
+                    else if (key.equals("AUDIO") && value != null)
                         values.put(StoryEntry.COLUMN_REMOTE_AUDIO, splits[1]);
-                    else if (key.equals("VIDEO"))
+                    else if (key.equals("VIDEO") && value != null)
                         values.put(StoryEntry.COLUMN_REMOTE_VIDEO, splits[1]);
-                    else if (key.equals("ESSAY"))
+                    else if (key.equals("ESSAY") && value != null)
                         values.put(StoryEntry.COLUMN_REMOTE_ESSAY, splits[1]);
-                    else if (key.equals("BIO"))
+                    else if (key.equals("BIO") && value != null)
                         values.put(StoryEntry.COLUMN_REMOTE_BIO, splits[1]);
                 }
             }
