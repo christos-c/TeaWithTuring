@@ -2,9 +2,17 @@ package com.christosc.teawithturing.data;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.res.Resources;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.provider.BaseColumns;
+
+import com.christosc.teawithturing.R;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 public final class StoriesDatabase extends SQLiteOpenHelper{
     // If you change the database schema, you must increment the database version.
@@ -74,54 +82,42 @@ public final class StoriesDatabase extends SQLiteOpenHelper{
     }
 
     public void seedData(SQLiteDatabase db){
-        //TODO Populate from file
+        InputStream inputStream;
+        inputStream = Resources.getSystem().openRawResource(R.raw.stories_data);
+        BufferedReader in = new BufferedReader(new InputStreamReader(inputStream));
+        String line;
         ContentValues values = new ContentValues();
-        values.put(StoryEntry.COLUMN_TITLE,"Story about Turing's work #1");
-        values.put(StoryEntry.COLUMN_AUTHOR,"Christos Christodouloupoulos");
-        values.put(StoryEntry.COLUMN_STORY_TYPE,StoryEntry.TYPE_DESK);
-        values.put(StoryEntry.COLUMN_REMOTE_TEXT,"http://christos-c.com/test/test.txt");
-        values.put(StoryEntry.COLUMN_REMOTE_AUDIO,"http://christos-c.com/papers/entscheidungsproblem.mp3");
-        values.put(StoryEntry.COLUMN_REMOTE_ESSAY, "http://christos-c.com/test/test.txt");
-        db.insert(StoryEntry.TABLE_NAME, null, values);
-
-        values = new ContentValues();
-        values.put(StoryEntry.COLUMN_TITLE,"Story about Turing's life #1");
-        values.put(StoryEntry.COLUMN_AUTHOR,"Christos Christodouloupoulos");
-        values.put(StoryEntry.COLUMN_STORY_TYPE,StoryEntry.TYPE_TREES);
-        values.put(StoryEntry.COLUMN_REMOTE_TEXT,"http://christos-c.com/test/test.txt");
-        values.put(StoryEntry.COLUMN_REMOTE_AUDIO,"http://christos-c.com/papers/entscheidungsproblem.mp3");
-        db.insert(StoryEntry.TABLE_NAME, null, values);
-
-        values = new ContentValues();
-        values.put(StoryEntry.COLUMN_TITLE,"Story about Turing's work #2");
-        values.put(StoryEntry.COLUMN_AUTHOR,"Christos Christodouloupoulos");
-        values.put(StoryEntry.COLUMN_STORY_TYPE,StoryEntry.TYPE_DESK);
-        values.put(StoryEntry.COLUMN_REMOTE_TEXT,"http://christos-c.com/test/test.txt");
-        values.put(StoryEntry.COLUMN_REMOTE_AUDIO,"http://christos-c.com/papers/entscheidungsproblem.mp3");
-        db.insert(StoryEntry.TABLE_NAME, null, values);
-
-        values = new ContentValues();
-        values.put(StoryEntry.COLUMN_TITLE,"Story about Turing's life #2");
-        values.put(StoryEntry.COLUMN_AUTHOR,"Christos Christodouloupoulos");
-        values.put(StoryEntry.COLUMN_STORY_TYPE,StoryEntry.TYPE_TREES);
-        values.put(StoryEntry.COLUMN_REMOTE_TEXT,"http://christos-c.com/test/test.txt");
-        values.put(StoryEntry.COLUMN_REMOTE_AUDIO,"http://christos-c.com/papers/entscheidungsproblem.mp3");
-        db.insert(StoryEntry.TABLE_NAME, null, values);
-
-        values = new ContentValues();
-        values.put(StoryEntry.COLUMN_TITLE,"Story about tea #1");
-        values.put(StoryEntry.COLUMN_AUTHOR,"Christos Christodouloupoulos");
-        values.put(StoryEntry.COLUMN_STORY_TYPE,StoryEntry.TYPE_TEA);
-        values.put(StoryEntry.COLUMN_REMOTE_TEXT,"http://christos-c.com/test/test.txt");
-        values.put(StoryEntry.COLUMN_REMOTE_AUDIO,"http://christos-c.com/papers/entscheidungsproblem.mp3");
-        db.insert(StoryEntry.TABLE_NAME, null, values);
-
-        values = new ContentValues();
-        values.put(StoryEntry.COLUMN_TITLE,"Story about tea #2");
-        values.put(StoryEntry.COLUMN_AUTHOR,"Christos Christodouloupoulos");
-        values.put(StoryEntry.COLUMN_STORY_TYPE,StoryEntry.TYPE_TEA);
-        values.put(StoryEntry.COLUMN_REMOTE_TEXT,"http://christos-c.com/test/test.txt");
-//        values.put(StoryEntry.COLUMN_REMOTE_AUDIO,"http://christos-c.com/papers/entscheidungsproblem.mp3");
-        db.insert(StoryEntry.TABLE_NAME, null, values);
+        try {
+            while ((line = in.readLine()) != null) {
+                // This is a new entry
+                if (line.isEmpty()) {
+                    if (values.size() > 1)
+                        db.insert(StoryEntry.TABLE_NAME, null, values);
+                    values.clear();
+                }
+                else {
+                    String[] splits = line.split("\t");
+                    String key = splits[0];
+                    if (key.equals("TITLE"))
+                        values.put(StoryEntry.COLUMN_TITLE, splits[1]);
+                    else if (key.equals("AUTHOR"))
+                        values.put(StoryEntry.COLUMN_AUTHOR, splits[1]);
+                    else if (key.equals("TYPE"))
+                        values.put(StoryEntry.COLUMN_STORY_TYPE, splits[1]);
+                    else if (key.equals("TEXT"))
+                        values.put(StoryEntry.COLUMN_REMOTE_TEXT, splits[1]);
+                    else if (key.equals("AUDIO"))
+                        values.put(StoryEntry.COLUMN_REMOTE_AUDIO, splits[1]);
+                    else if (key.equals("VIDEO"))
+                        values.put(StoryEntry.COLUMN_REMOTE_VIDEO, splits[1]);
+                    else if (key.equals("ESSAY"))
+                        values.put(StoryEntry.COLUMN_REMOTE_ESSAY, splits[1]);
+                    else if (key.equals("BIO"))
+                        values.put(StoryEntry.COLUMN_REMOTE_BIO, splits[1]);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -4,7 +4,6 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/TakeTeaWithTuring.iml" filepath="$PROJECT_DIR$/TakeTeaWithTuring.iml" />
       <module fileurl="file://$PROJECT_DIR$/TeaWithTuring/TeaWithTuring.iml" filepath="$PROJECT_DIR$/TeaWithTuring/TeaWithTuring.iml" />
-      <module fileurl="file://$PROJECT_DIR$/TeaWithTuring/TeaWithTuring-TeaWithTuring.iml" filepath="$PROJECT_DIR$/TeaWithTuring/TeaWithTuring-TeaWithTuring.iml" />
     </modules>
   </component>
 </project>

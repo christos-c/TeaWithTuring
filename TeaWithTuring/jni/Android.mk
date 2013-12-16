@@ -18,7 +18,7 @@ LOCAL_PATH := $(call my-dir)
 
 include $(CLEAR_VARS)
 LOCAL_MODULE := QCAR-prebuilt
-LOCAL_SRC_FILES = /cygdrive/c/Users/Chris/AppData/Local/Android/android-studio/vuforia-sdk/build/lib/$(TARGET_ARCH_ABI)/libQCAR.so
+LOCAL_SRC_FILES = ../libs/$(TARGET_ARCH_ABI)/libQCAR.so
 LOCAL_EXPORT_C_INCLUDES := /cygdrive/c/Users/Chris/AppData/Local/Android/android-studio/vuforia-sdk/build/include
 include $(PREBUILT_SHARED_LIBRARY)
 
@@ -86,7 +86,7 @@ LOCAL_SHARED_LIBRARIES := QCAR-prebuilt
 # compute dependencies automatically for you, just list the source files
 # that will be passed directly to a compiler.
 
-LOCAL_SRC_FILES := StoryScanActivity.cpp SampleUtils.cpp Texture.cpp
+LOCAL_SRC_FILES := StoryScanActivity.cpp
 
 # By default, ARM target binaries will be generated in 'thumb' mode, where
 # each instruction is 16-bit wide. You can set this variable to 'arm' to
