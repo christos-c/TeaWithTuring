@@ -16,15 +16,15 @@ public class StoryVideoFragment extends Fragment {
     private static MediaController mediaController;
     private static View rootView;
     private static VideoView videoView;
-    private static ProgressBar loadingIndicator;
+//    private static ProgressBar loadingIndicator;
     private static String videoURL, videoLocal;
 
-    public static Fragment newInstance() {
+    public static Fragment newInstance(String mVideoURL, String mVideoLocal) {
         if (videoFragment == null){
             videoFragment = new StoryVideoFragment();
             Bundle args = new Bundle();
-            args.putString(Story.ARG_VIDEO_URL, Story.mVideoURL);
-            args.putString(Story.ARG_VIDEO_LOCAL, Story.mVideoLocal);
+            args.putString(Story.ARG_VIDEO_URL, mVideoURL);
+            args.putString(Story.ARG_VIDEO_LOCAL, mVideoLocal);
             videoFragment.setArguments(args);
         }
         return videoFragment;
@@ -36,15 +36,16 @@ public class StoryVideoFragment extends Fragment {
         Bundle args = getArguments();
         videoURL = args.getString(Story.ARG_VIDEO_URL);
         videoLocal = args.getString(Story.ARG_VIDEO_LOCAL);
+
+        mediaController = new MediaController(getActivity());
+
     }
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_story_video, container, false);
         assert rootView != null;
-        mediaController = new MediaController(getActivity());
         videoView =(VideoView) rootView.findViewById(R.id.videoView);
-        loadingIndicator = (ProgressBar) rootView.findViewById(R.id.video_loading_indicator);
         new Player().execute(videoURL, videoLocal);
         return rootView;
     }
@@ -72,7 +73,6 @@ public class StoryVideoFragment extends Fragment {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            loadingIndicator.setVisibility(View.VISIBLE);
             Log.d("VIDEO", "Pre-execute player");
         }
 
@@ -108,9 +108,8 @@ public class StoryVideoFragment extends Fragment {
             mediaController.setAnchorView(videoView);
             mediaController.setMediaPlayer(videoView);
             videoView.setMediaController(mediaController);
-            videoView.requestFocus();
+//            videoView.requestFocus();
             videoView.setVisibility(View.VISIBLE);
-            loadingIndicator.setVisibility(View.GONE);
         }
     }
 }

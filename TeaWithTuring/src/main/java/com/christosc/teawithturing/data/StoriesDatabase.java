@@ -100,23 +100,23 @@ public final class StoriesDatabase extends SQLiteOpenHelper{
                 else {
                     String[] splits = line.split("\t");
                     String key = splits[0];
-                    String value = (splits.length > 1 ? splits[1] : null);
-                    if (key.equals("TITLE") && value != null)
-                        values.put(StoryEntry.COLUMN_TITLE, splits[1]);
-                    else if (key.equals("AUTHOR") && value != null)
-                        values.put(StoryEntry.COLUMN_AUTHOR, splits[1]);
-                    else if (key.equals("TYPE") && value != null)
-                        values.put(StoryEntry.COLUMN_STORY_TYPE, splits[1]);
-                    else if (key.equals("TEXT") && value != null)
-                        values.put(StoryEntry.COLUMN_REMOTE_TEXT, splits[1]);
-                    else if (key.equals("AUDIO") && value != null)
-                        values.put(StoryEntry.COLUMN_REMOTE_AUDIO, splits[1]);
-                    else if (key.equals("VIDEO") && value != null)
-                        values.put(StoryEntry.COLUMN_REMOTE_VIDEO, splits[1]);
-                    else if (key.equals("ESSAY") && value != null)
-                        values.put(StoryEntry.COLUMN_REMOTE_ESSAY, splits[1]);
-                    else if (key.equals("BIO") && value != null)
-                        values.put(StoryEntry.COLUMN_REMOTE_BIO, splits[1]);
+                    String value = (splits.length > 1 ? splits[1] : "");
+                    if (key.equals("TITLE"))
+                        values.put(StoryEntry.COLUMN_TITLE, value);
+                    else if (key.equals("AUTHOR"))
+                        values.put(StoryEntry.COLUMN_AUTHOR, value);
+                    else if (key.equals("TYPE"))
+                        values.put(StoryEntry.COLUMN_STORY_TYPE, value);
+                    else if (key.equals("TEXT"))
+                        values.put(StoryEntry.COLUMN_REMOTE_TEXT, value);
+                    else if (key.equals("AUDIO"))
+                        values.put(StoryEntry.COLUMN_REMOTE_AUDIO, value);
+                    else if (key.equals("VIDEO"))
+                        values.put(StoryEntry.COLUMN_REMOTE_VIDEO, value);
+                    else if (key.equals("ESSAY"))
+                        values.put(StoryEntry.COLUMN_REMOTE_ESSAY, value);
+                    else if (key.equals("BIO"))
+                        values.put(StoryEntry.COLUMN_REMOTE_BIO, value);
                 }
             }
         } catch (IOException e) {

@@ -48,9 +48,18 @@ public class Story extends Activity implements ActionBar.TabListener {
     public static final String ARG_BIO_URL = "bio_url";
     public static final String ARG_BIO_LOCAL = "bio_local";
 
-    protected static String mStoryID, mStoryTitle, mTextURL, mTextLocal,
-            mAudioURL, mAudioLocal, mVideoURL, mVideoLocal, mEssayURL, mEssayLocal,
-            mBioURL, mBioLocal;
+    protected static String mStoryID;
+    protected String mStoryTitle;
+    protected String mTextURL;
+    protected String mTextLocal;
+    protected String mAudioURL;
+    protected String mAudioLocal;
+    protected String mVideoURL;
+    protected String mVideoLocal;
+    protected String mEssayURL;
+    protected String mEssayLocal;
+    protected String mBioURL;
+    protected String mBioLocal;
 
     /**
      * The integers corresponding to the different tabs of the story
@@ -83,10 +92,10 @@ public class Story extends Activity implements ActionBar.TabListener {
 
         // Check which tabs should be active
         activeTabs = new ArrayList<Integer>();
-        if (exists(mTextURL, mTextLocal)) activeTabs.add(TAB_TEXT);
-        if (exists(mVideoURL, mVideoLocal)) activeTabs.add(TAB_VIDEO);
-        if (exists(mEssayURL, mEssayLocal)) activeTabs.add(TAB_ESSAY);
-        if (exists(mBioURL, mBioLocal)) activeTabs.add(TAB_BIO);
+        if (exists(mTextURL)) activeTabs.add(TAB_TEXT);
+        if (exists(mVideoURL)) activeTabs.add(TAB_VIDEO);
+        if (exists(mEssayURL)) activeTabs.add(TAB_ESSAY);
+        if (exists(mBioURL)) activeTabs.add(TAB_BIO);
 
         // Set up the action bar.
         final ActionBar actionBar = getActionBar();
@@ -105,7 +114,8 @@ public class Story extends Activity implements ActionBar.TabListener {
         mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
             public void onPageSelected(int position) {
-                if (position == TAB_VIDEO) StoryVideoFragment.showVideo();
+                // NB Added this extra logic to show the video controllers
+                if (activeTabs.get(position) == TAB_VIDEO) StoryVideoFragment.showVideo();
                 actionBar.setSelectedNavigationItem(position);
             }
         });
@@ -123,9 +133,8 @@ public class Story extends Activity implements ActionBar.TabListener {
         }
     }
 
-    protected static boolean exists(String argURL, String argLocal) {
-        return ((argURL != null && !argURL.isEmpty()) ||
-                (argLocal != null && !argLocal.isEmpty()));
+    protected static boolean exists(String argURL) {
+        return (argURL != null && !argURL.isEmpty());
     }
 
     @Override
@@ -198,11 +207,16 @@ public class Story extends Activity implements ActionBar.TabListener {
         public Fragment getItem(int position) {
             //TODO change this to activeTabs
             // getItem is called to instantiate the fragment for the given page.
-            if (position == TAB_TEXT) {
-                return StoryDetailFragment.newInstance();
+            int activeTabPosition = activeTabs.get(position);
+            if (activeTabPosition == TAB_TEXT) {
+                return StoryDetailFragment.newInstance(mTextURL, mTextLocal,
+                        mAudioURL, mAudioLocal, mStoryID);
             }
-            else if (position == TAB_VIDEO) {
-                return StoryVideoFragment.newInstance();
+            else if (activeTabPosition == TAB_VIDEO) {
+                return StoryVideoFragment.newInstance(mVideoURL, mVideoLocal);
+            }
+            else if (activeTabPosition == TAB_ESSAY) {
+                return StoryEssayFragment.newInstance(mEssayURL, mEssayLocal, mStoryID);
             }
             else
                 //TODO create new Fragments for Essay and Bio
@@ -212,7 +226,7 @@ public class Story extends Activity implements ActionBar.TabListener {
 
         @Override
         public int getCount() {
-            // Show 4 total pages: Story, Video, Essay and Bio.
+            // Show the number of active tabs depending on the database fields
             return activeTabs.size();
         }
 
