@@ -83,7 +83,7 @@ public final class StoriesDatabase extends SQLiteOpenHelper{
 
     public void seedData(SQLiteDatabase db){
         InputStream inputStream;
-        inputStream = Resources.getSystem().openRawResource(R.raw.stories_data);
+        inputStream = Resources.getSystem().openRawResource(R.raw.stories);
         BufferedReader in = new BufferedReader(new InputStreamReader(inputStream));
         String line;
         ContentValues values = new ContentValues();
