@@ -20,12 +20,12 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
 
-public class StoryEssayFragment extends Fragment {
+public class StoryBioFragment extends Fragment {
     private ScrollView scrollView;
     private Bundle savedState = null;
-    private static StoryEssayFragment essayFragment;
+    private static StoryBioFragment bioFragment;
 
-    private static String essayText, mEssayURL, mEssayLocal, mStoryID;
+    private static String bioText, mBioURL, mBioLocal, mStoryID;
 
     private static RetrieveTextTask retrieveTextTask;
     private static View rootView;
@@ -34,19 +34,19 @@ public class StoryEssayFragment extends Fragment {
      * Returns a new instance of this fragment for the given section
      * number.
      */
-    public static StoryEssayFragment newInstance(String remoteText, String localText,
+    public static StoryBioFragment newInstance(String remoteText, String localText,
                                                  String storyID) {
-        mEssayURL = remoteText;
-        mEssayLocal = localText;
+        mBioURL = remoteText;
+        mBioLocal = localText;
         mStoryID = storyID;
-        if (essayFragment == null) {
-            essayFragment = new StoryEssayFragment();
+        if (bioFragment == null) {
+            bioFragment = new StoryBioFragment();
             Bundle args = new Bundle();
-            args.putString(Story.ARG_ESSAY_URL, mEssayURL);
-            args.putString(Story.ARG_ESSAY_LOCAL, mEssayLocal);
-            essayFragment.setArguments(args);
+            args.putString(Story.ARG_BIO_URL, mBioURL);
+            args.putString(Story.ARG_BIO_LOCAL, mBioLocal);
+            bioFragment.setArguments(args);
         }
-        return essayFragment;
+        return bioFragment;
     }
 
     @Override
@@ -65,7 +65,7 @@ public class StoryEssayFragment extends Fragment {
         if (savedInstanceState != null || savedState != null) {
             if (savedInstanceState == null)
                 savedInstanceState = savedState;
-            localStoryText = savedInstanceState.getString("essayText");
+            localStoryText = savedInstanceState.getString("bioText");
             final int[] position = savedInstanceState.getIntArray("scrollPosition");
             assert position != null;
             scrollView.post(new Runnable() {
@@ -76,7 +76,7 @@ public class StoryEssayFragment extends Fragment {
             textView.setText(localStoryText);
         }
         else {
-            retrieveTextTask.execute(mEssayURL, mEssayLocal);
+            retrieveTextTask.execute(mBioURL, mBioLocal);
         }
         return rootView;
     }
@@ -85,7 +85,7 @@ public class StoryEssayFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         savedState = new Bundle();
-        savedState.putString("essayText", essayText);
+        savedState.putString("bioText", bioText);
         savedState.putIntArray("scrollPosition",
                 new int[]{scrollView.getScrollX(), scrollView.getScrollY()});
     }
@@ -93,7 +93,7 @@ public class StoryEssayFragment extends Fragment {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putString("essayText", essayText);
+        outState.putString("bioText", bioText);
         outState.putIntArray("scrollPosition",
                 new int[]{scrollView.getScrollX(), scrollView.getScrollY()});
     }
@@ -138,12 +138,12 @@ public class StoryEssayFragment extends Fragment {
 
         protected void onPostExecute(String text) {
             //Create the name for the local file
-            if (mEssayLocal == null){
-                mEssayLocal = "TeaWithTuringStory"+mStoryID+"-essay";
-                DataStorage.saveTextToFile(text, mEssayLocal,
+            if (mBioLocal == null){
+                mBioLocal = "TeaWithTuringStory"+mStoryID+"-bio";
+                DataStorage.saveTextToFile(text, mBioLocal,
                         getActivity().getApplicationContext());
                 ContentValues values = new ContentValues();
-                values.put(StoriesDatabase.StoryEntry.COLUMN_LOCAL_ESSAY, mEssayLocal);
+                values.put(StoriesDatabase.StoryEntry.COLUMN_LOCAL_BIO, mBioLocal);
                 Uri uri = Uri.withAppendedPath(StoriesProvider.CONTENT_URI, mStoryID);
                 assert uri != null;
                 getActivity().getContentResolver().update(uri, values, null, null);
@@ -151,7 +151,7 @@ public class StoryEssayFragment extends Fragment {
             rootView.findViewById(R.id.text_loading_progress_bar).setVisibility(View.GONE);
             TextView textView = (TextView) rootView.findViewById(R.id.story_detail);
             textView.setText(text);
-            essayText = text;
+            bioText = text;
         }
     }
 }

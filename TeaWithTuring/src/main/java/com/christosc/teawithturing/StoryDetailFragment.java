@@ -36,6 +36,8 @@ public class StoryDetailFragment extends Fragment {
     private static RetrieveTextTask retrieveTextTask;
     private static View rootView;
 
+    private static String audioFragmentTag;
+
     /**
      * Returns a new instance of this fragment for the given section
      * number.
@@ -80,10 +82,16 @@ public class StoryDetailFragment extends Fragment {
         scrollView = (ScrollView) rootView.findViewById(R.id.story_scroller);
         FragmentManager fragmentManager = getFragmentManager();
         if (Story.exists(mAudioURL)) {
-            String audioFragmentTag = "audio_frag";
+            audioFragmentTag = "audio_frag";
+            FragmentTransaction transaction = getFragmentManager().beginTransaction();
             Fragment f = fragmentManager.findFragmentByTag(audioFragmentTag);
             if (f == null) {
-                FragmentTransaction transaction = getFragmentManager().beginTransaction();
+                transaction.add(R.id.story_detail_container, audioFragment, audioFragmentTag);
+                transaction.commit();
+            }
+            else {
+                // Detach the audio fragment
+                transaction.remove(f);
                 transaction.add(R.id.story_detail_container, audioFragment, audioFragmentTag);
                 transaction.commit();
             }

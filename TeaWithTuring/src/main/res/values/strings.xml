@@ -17,5 +17,7 @@
     <string name="image_descriptor_download">Download Audio</string>
 
     <string name="activity_scan">Scan Story Marker</string>
+    <string name="showcase_title">Tutorial</string>
+    <string name="showcase_message">This is a demo message for the tutorial</string>
 
 </resources>

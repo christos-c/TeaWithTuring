@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class Story extends Activity implements ActionBar.TabListener {
+public class Story extends Activity {// implements ActionBar.TabListener {
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -27,12 +27,12 @@ public class Story extends Activity implements ActionBar.TabListener {
      * may be best to switch to a
      * {@link android.support.v13.app.FragmentStatePagerAdapter}.
      */
-    SectionsPagerAdapter mSectionsPagerAdapter;
+//    SectionsPagerAdapter mSectionsPagerAdapter;
 
     /**
      * The {@link ViewPager} that will host the section contents.
      */
-    ViewPager mViewPager;
+//    ViewPager mViewPager;
 
     public static final String ARG_STORY_ID = "story_id";
     public static final String ARG_STORY_TITLE = "story_title";
@@ -69,8 +69,6 @@ public class Story extends Activity implements ActionBar.TabListener {
     private static final int TAB_ESSAY = 2;
     private static final int TAB_BIO = 3;
 
-    private static List<Integer> activeTabs;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -91,7 +89,7 @@ public class Story extends Activity implements ActionBar.TabListener {
         setTitle(mStoryTitle);
 
         // Check which tabs should be active
-        activeTabs = new ArrayList<Integer>();
+        List<Integer> activeTabs = new ArrayList<Integer>();
         if (exists(mTextURL)) activeTabs.add(TAB_TEXT);
         if (exists(mVideoURL)) activeTabs.add(TAB_VIDEO);
         if (exists(mEssayURL)) activeTabs.add(TAB_ESSAY);
@@ -102,26 +100,26 @@ public class Story extends Activity implements ActionBar.TabListener {
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
         // Create the adapter that will return a fragment for each of the sections of the activity.
-        mSectionsPagerAdapter = new SectionsPagerAdapter(getFragmentManager());
+//        mSectionsPagerAdapter = new SectionsPagerAdapter(getFragmentManager());
 
         // Set up the ViewPager with the sections adapter.
-        mViewPager = (ViewPager) findViewById(R.id.pager);
-        mViewPager.setAdapter(mSectionsPagerAdapter);
+//        mViewPager = (ViewPager) findViewById(R.id.pager);
+//        mViewPager.setAdapter(mSectionsPagerAdapter);
 
         // When swiping between different sections, select the corresponding
         // tab. We can also use ActionBar.Tab#select() to do this if we have
         // a reference to the Tab.
-        mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+        /*mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
             public void onPageSelected(int position) {
                 // NB Added this extra logic to show the video controllers
                 if (activeTabs.get(position) == TAB_VIDEO) StoryVideoFragment.showVideo();
                 actionBar.setSelectedNavigationItem(position);
             }
-        });
+        });*/
 
         // For each of the sections in the app, add a tab to the action bar.
-        for (int position : activeTabs) {
+        /*for (int position : activeTabs) {
             // Create a tab with text corresponding to the page title defined by
             // the adapter. Also specify this Activity object, which implements
             // the TabListener interface, as the callback (listener) for when
@@ -130,7 +128,51 @@ public class Story extends Activity implements ActionBar.TabListener {
                     actionBar.newTab()
                             .setText(mSectionsPagerAdapter.getPageTitle(position))
                             .setTabListener(this));
+        }*/
+
+        for (int tabId : activeTabs) {
+            switch (tabId) {
+                case TAB_TEXT:
+                    actionBar.addTab(actionBar.newTab()
+                            .setText(getPageTitle(tabId))
+                            .setTabListener(new StoryTabListener<StoryDetailFragment>(
+                                    this, getPageTitle(tabId), StoryDetailFragment.class)));
+                    break;
+                case TAB_VIDEO:
+                    actionBar.addTab(actionBar.newTab()
+                            .setText(getPageTitle(tabId))
+                            .setTabListener(new StoryTabListener<StoryVideoFragment>(
+                                    this, getPageTitle(tabId), StoryVideoFragment.class)));
+                    break;
+                case TAB_ESSAY:
+                    actionBar.addTab(actionBar.newTab()
+                            .setText(getPageTitle(tabId))
+                            .setTabListener(new StoryTabListener<StoryEssayFragment>(
+                                    this, getPageTitle(tabId), StoryEssayFragment.class)));
+                    break;
+                case TAB_BIO:
+                    actionBar.addTab(actionBar.newTab()
+                            .setText(getPageTitle(tabId))
+                            .setTabListener(new StoryTabListener<StoryBioFragment>(
+                                    this, getPageTitle(tabId), StoryBioFragment.class)));
+            }
+
         }
+    }
+
+    protected String getPageTitle(int position) {
+        Locale l = Locale.getDefault();
+        switch (position) {
+            case TAB_TEXT:
+                return getString(R.string.title_section_text).toUpperCase(l);
+            case TAB_VIDEO:
+                return getString(R.string.title_section_video).toUpperCase(l);
+            case TAB_ESSAY:
+                return getString(R.string.title_section_essay).toUpperCase(l);
+            case TAB_BIO:
+                return getString(R.string.title_section_bio).toUpperCase(l);
+        }
+        return null;
     }
 
     protected static boolean exists(String argURL) {
@@ -177,6 +219,8 @@ public class Story extends Activity implements ActionBar.TabListener {
         else return getIntent().getStringExtra(name);
     }
 
+    //TODO Remove these if satisfied with static tabs without swipe
+    /**
     @Override
     public void onTabSelected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
         // When the given tab is selected, switch to the corresponding page in
@@ -193,10 +237,6 @@ public class Story extends Activity implements ActionBar.TabListener {
     public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
     }
 
-    /**
-     * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
-     * one of the sections/tabs/pages.
-     */
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
         public SectionsPagerAdapter(FragmentManager fm) {
@@ -205,7 +245,6 @@ public class Story extends Activity implements ActionBar.TabListener {
 
         @Override
         public Fragment getItem(int position) {
-            //TODO change this to activeTabs
             // getItem is called to instantiate the fragment for the given page.
             int activeTabPosition = activeTabs.get(position);
             if (activeTabPosition == TAB_TEXT) {
@@ -218,10 +257,11 @@ public class Story extends Activity implements ActionBar.TabListener {
             else if (activeTabPosition == TAB_ESSAY) {
                 return StoryEssayFragment.newInstance(mEssayURL, mEssayLocal, mStoryID);
             }
+            else if (activeTabPosition == TAB_BIO) {
+                return StoryBioFragment.newInstance(mBioURL, mBioLocal, mStoryID);
+            }
             else
-                //TODO create new Fragments for Essay and Bio
-                // Return a PlaceholderFragment (defined as a static inner class below).
-                return PlaceholderFragment.newInstance(position + 1);
+                return null;
         }
 
         @Override
@@ -246,39 +286,5 @@ public class Story extends Activity implements ActionBar.TabListener {
             return null;
         }
     }
-
-    /**
-     * A placeholder fragment containing a simple view.
-     */
-    public static class PlaceholderFragment extends Fragment {
-        /**
-         * The fragment argument representing the section number for this
-         * fragment.
-         */
-        private static final String ARG_SECTION_NUMBER = "section_number";
-
-        /**
-         * Returns a new instance of this fragment for the given section
-         * number.
-         */
-        public static PlaceholderFragment newInstance(int sectionNumber) {
-            PlaceholderFragment fragment = new PlaceholderFragment();
-            Bundle args = new Bundle();
-            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
-            fragment.setArguments(args);
-            return fragment;
-        }
-
-        public PlaceholderFragment() {
-        }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_story_generic, container, false);
-            TextView textView = (TextView) rootView.findViewById(R.id.section_label);
-            textView.setText(Integer.toString(getArguments().getInt(ARG_SECTION_NUMBER)));
-            return rootView;
-        }
-    }
+        */
 }

@@ -53,19 +53,6 @@ public class StoryAudioFragment extends Fragment {
         audioURL = args.getString(Story.ARG_AUDIO_URL);
         audioLocal = args.getString(Story.ARG_AUDIO_LOCAL);
         storyID = args.getString(Story.ARG_STORY_ID);
-
-        mediaPlayer = new MediaPlayer();
-        mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-        mediaPlayer.setOnBufferingUpdateListener(updateListener);
-        mediaPlayer.setOnCompletionListener(new OnCompletionListener() {
-
-            @Override
-            public void onCompletion(MediaPlayer mp) {
-                mediaPlayer.stop();
-                mediaPlayer.reset();
-            }
-        });
-        handler.postDelayed(runnable, 1000);
     }
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -85,7 +72,21 @@ public class StoryAudioFragment extends Fragment {
 
         loadingIndicator = (ProgressBar) rootView.findViewById(R.id.audio_loading_indicator);
 
+        mediaPlayer = new MediaPlayer();
+        mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+        mediaPlayer.setOnBufferingUpdateListener(updateListener);
+        mediaPlayer.setOnCompletionListener(new OnCompletionListener() {
+
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                mediaPlayer.stop();
+                mediaPlayer.reset();
+            }
+        });
+        handler.postDelayed(runnable, 1000);
+
         new Player().execute(audioURL, audioLocal);
+
         return rootView;
     }
 
