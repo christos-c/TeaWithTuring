@@ -10,4 +10,14 @@
     <VideoView android:id="@+id/videoView"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"/>
+
+    <ProgressBar
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/video_progressBar"
+        android:layout_alignParentTop="false"
+        android:layout_alignParentEnd="false"
+        android:layout_alignParentBottom="false"
+        android:layout_centerInParent="true"
+        android:visibility="gone" />
 </RelativeLayout>

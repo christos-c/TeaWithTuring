@@ -23,41 +23,46 @@ import java.net.URL;
 public class StoryEssayFragment extends Fragment {
     private ScrollView scrollView;
     private Bundle savedState = null;
-    private static StoryEssayFragment essayFragment;
 
-    private static String essayText, mEssayURL, mEssayLocal, mStoryID;
+    private static String mEssayText;
 
     private static RetrieveTextTask retrieveTextTask;
     private static View rootView;
+
+    private static String tag = "INFO-ESSAY";
 
     /**
      * Returns a new instance of this fragment for the given section
      * number.
      */
-    public static StoryEssayFragment newInstance(String remoteText, String localText,
+    /*public static StoryEssayFragment newInstance(String remoteText, String localText,
                                                  String storyID) {
         mEssayURL = remoteText;
-        mEssayLocal = localText;
+        mEssayFileLocal = localText;
         mStoryID = storyID;
         if (essayFragment == null) {
             essayFragment = new StoryEssayFragment();
             Bundle args = new Bundle();
             args.putString(Story.ARG_ESSAY_URL, mEssayURL);
-            args.putString(Story.ARG_ESSAY_LOCAL, mEssayLocal);
+            args.putString(Story.ARG_ESSAY_LOCAL, mEssayFileLocal);
             essayFragment.setArguments(args);
         }
         return essayFragment;
-    }
+    }*/
+
+    public StoryEssayFragment() {}
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d(tag, "Creating fragment");
         retrieveTextTask = new RetrieveTextTask();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Log.d(tag, "Creating view");
         rootView = inflater.inflate(R.layout.fragment_story_text, container, false);
         TextView textView = (TextView) rootView.findViewById(R.id.story_detail);
         scrollView = (ScrollView) rootView.findViewById(R.id.story_scroller);
@@ -65,7 +70,7 @@ public class StoryEssayFragment extends Fragment {
         if (savedInstanceState != null || savedState != null) {
             if (savedInstanceState == null)
                 savedInstanceState = savedState;
-            localStoryText = savedInstanceState.getString("essayText");
+            localStoryText = savedInstanceState.getString("mEssayText");
             final int[] position = savedInstanceState.getIntArray("scrollPosition");
             assert position != null;
             scrollView.post(new Runnable() {
@@ -76,7 +81,7 @@ public class StoryEssayFragment extends Fragment {
             textView.setText(localStoryText);
         }
         else {
-            retrieveTextTask.execute(mEssayURL, mEssayLocal);
+            retrieveTextTask.execute(Story.mEssayURL, Story.mEssayLocal);
         }
         return rootView;
     }
@@ -85,7 +90,7 @@ public class StoryEssayFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         savedState = new Bundle();
-        savedState.putString("essayText", essayText);
+        savedState.putString("mEssayText", mEssayText);
         savedState.putIntArray("scrollPosition",
                 new int[]{scrollView.getScrollX(), scrollView.getScrollY()});
     }
@@ -93,7 +98,7 @@ public class StoryEssayFragment extends Fragment {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putString("essayText", essayText);
+        outState.putString("mEssayText", mEssayText);
         outState.putIntArray("scrollPosition",
                 new int[]{scrollView.getScrollX(), scrollView.getScrollY()});
     }
@@ -106,29 +111,29 @@ public class StoryEssayFragment extends Fragment {
         }
 
         protected String doInBackground(String... urls) {
-            String storyText = "";
+            String essayText = "";
             try {
                 URL url= new URL(urls[0]);
                 String local = urls[1];
                 if (local != null){
-                    Log.d("ESSAY-LOAD", "Loading from file");
-                    storyText = DataStorage.readTextFromFile(local,
+                    Log.d(tag, "Loading from file");
+                    essayText = DataStorage.readTextFromFile(local,
                             getActivity().getApplicationContext());
                 }
                 else {
-                    Log.d("ESSAY-LOAD", "Loading from URL");
+                    Log.d(tag, "Loading from URL");
                     BufferedReader in = new BufferedReader(
                             new InputStreamReader(url.openStream()));
                     String str;
                     while ((str = in.readLine()) != null) {
-                        storyText += str+"\n";
+                        essayText += str+"\n";
                     }
                     in.close();
                 }
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            return storyText;
+            return essayText;
         }
 
         @Override
@@ -138,20 +143,20 @@ public class StoryEssayFragment extends Fragment {
 
         protected void onPostExecute(String text) {
             //Create the name for the local file
-            if (mEssayLocal == null){
-                mEssayLocal = "TeaWithTuringStory"+mStoryID+"-essay";
-                DataStorage.saveTextToFile(text, mEssayLocal,
+            if (Story.mEssayLocal == null){
+                Story.mEssayLocal = "TeaWithTuringStory"+Story.mStoryID+"-essay";
+                DataStorage.saveTextToFile(text, Story.mEssayLocal,
                         getActivity().getApplicationContext());
                 ContentValues values = new ContentValues();
-                values.put(StoriesDatabase.StoryEntry.COLUMN_LOCAL_ESSAY, mEssayLocal);
-                Uri uri = Uri.withAppendedPath(StoriesProvider.CONTENT_URI, mStoryID);
+                values.put(StoriesDatabase.StoryEntry.COLUMN_LOCAL_ESSAY, Story.mEssayLocal);
+                Uri uri = Uri.withAppendedPath(StoriesProvider.CONTENT_URI, Story.mStoryID);
                 assert uri != null;
                 getActivity().getContentResolver().update(uri, values, null, null);
             }
             rootView.findViewById(R.id.text_loading_progress_bar).setVisibility(View.GONE);
             TextView textView = (TextView) rootView.findViewById(R.id.story_detail);
             textView.setText(text);
-            essayText = text;
+            mEssayText = text;
         }
     }
 }

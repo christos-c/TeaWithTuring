@@ -18,7 +18,9 @@ import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 
 import com.christosc.teawithturing.data.DataStorage;
@@ -41,7 +43,9 @@ public class StoryAudioFragment extends Fragment {
 
     private Handler handler = new Handler();
 
-    private String audioLocal, audioURL, storyID;
+    private Player player;
+
+    private Bundle savedState = null;
 
     public StoryAudioFragment(){}
 
@@ -49,10 +53,20 @@ public class StoryAudioFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Bundle args = getArguments();
-        audioURL = args.getString(Story.ARG_AUDIO_URL);
-        audioLocal = args.getString(Story.ARG_AUDIO_LOCAL);
-        storyID = args.getString(Story.ARG_STORY_ID);
+        mediaPlayer = new MediaPlayer();
+        mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+        mediaPlayer.setOnBufferingUpdateListener(updateListener);
+        mediaPlayer.setOnCompletionListener(new OnCompletionListener() {
+
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                mediaPlayer.stop();
+                mediaPlayer.reset();
+            }
+        });
+        handler.postDelayed(runnable, 1000);
+
+        player = new Player();
     }
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -72,20 +86,20 @@ public class StoryAudioFragment extends Fragment {
 
         loadingIndicator = (ProgressBar) rootView.findViewById(R.id.audio_loading_indicator);
 
-        mediaPlayer = new MediaPlayer();
-        mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-        mediaPlayer.setOnBufferingUpdateListener(updateListener);
-        mediaPlayer.setOnCompletionListener(new OnCompletionListener() {
+        if (Story.exists(Story.mAudioLocal)) buttonDownload.setVisibility(View.GONE);
 
-            @Override
-            public void onCompletion(MediaPlayer mp) {
-                mediaPlayer.stop();
-                mediaPlayer.reset();
-            }
-        });
-        handler.postDelayed(runnable, 1000);
-
-        new Player().execute(audioURL, audioLocal);
+        if (savedInstanceState != null || savedState != null) {
+            if (savedInstanceState == null)
+                savedInstanceState = savedState;
+            int pos = savedInstanceState.getInt("audioPos");
+            // If the media player is playing while moving back to this tab,
+            // switch to the pause button (instead of the default play)
+            if (mediaPlayer.isPlaying())
+                imagePlayPause.setImageResource(R.drawable.ic_action_pause);
+        }
+        else {
+            player.execute(Story.mAudioURL, Story.mAudioLocal);
+        }
 
         return rootView;
     }
@@ -93,16 +107,24 @@ public class StoryAudioFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
-        if (mediaPlayer != null) {
-            mediaPlayer.reset();
-            mediaPlayer.release();
-            mediaPlayer = null;
-        }
+//        if (mediaPlayer != null) {
+//            mediaPlayer.reset();
+//            mediaPlayer.release();
+//            mediaPlayer = null;
+//        }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        savedState = new Bundle();
+        savedState.putInt("audioPos", mediaPlayer.getCurrentPosition());
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+        outState.putInt("audioPos", mediaPlayer.getCurrentPosition());
     }
 
     class Player extends AsyncTask<String, Void, Boolean> {
@@ -155,7 +177,7 @@ public class StoryAudioFragment extends Fragment {
             loadingIndicator.setVisibility(View.GONE);
             imagePlayPause.setVisibility(View.VISIBLE);
             seekBarProgress.setVisibility(View.VISIBLE);
-            if (audioLocal == null)
+            if (Story.mAudioLocal == null)
                 buttonDownload.setVisibility(View.VISIBLE);
 
             Log.d("Prepared", "//" + result);
@@ -163,7 +185,7 @@ public class StoryAudioFragment extends Fragment {
     }
 
     class Downloader extends AsyncTask<String, Void, Boolean> {
-        private String audioLocal = "TeaWithTuringStory"+storyID+"-audio";
+        private String audioLocal = "TeaWithTuringStory"+Story.mStoryID+"-audio";
 
         @Override
         protected Boolean doInBackground(String... urls) {
@@ -194,7 +216,7 @@ public class StoryAudioFragment extends Fragment {
             //Update the database entry
             ContentValues values = new ContentValues();
             values.put(StoriesDatabase.StoryEntry.COLUMN_LOCAL_AUDIO, audioLocal);
-            Uri uri = Uri.withAppendedPath(StoriesProvider.CONTENT_URI, storyID);
+            Uri uri = Uri.withAppendedPath(StoriesProvider.CONTENT_URI, Story.mStoryID);
             assert uri != null;
             getActivity().getContentResolver().update(uri, values, null, null);
         }
@@ -219,7 +241,7 @@ public class StoryAudioFragment extends Fragment {
         @Override
         public void onClick(View v){
             buttonDownload.setEnabled(false);
-            new Downloader().execute(audioURL);
+            new Downloader().execute(Story.mAudioURL);
         }
     };
 

@@ -2,16 +2,9 @@ package com.christosc.teawithturing;
 
 import android.app.ActionBar;
 import android.app.Activity;
-import android.app.Fragment;
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.support.v13.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,30 +42,21 @@ public class Story extends Activity {// implements ActionBar.TabListener {
     public static final String ARG_BIO_LOCAL = "bio_local";
 
     protected static String mStoryID;
-    protected String mStoryTitle;
-    protected String mTextURL;
-    protected String mTextLocal;
-    protected String mAudioURL;
-    protected String mAudioLocal;
-    protected String mVideoURL;
-    protected String mVideoLocal;
-    protected String mEssayURL;
-    protected String mEssayLocal;
-    protected String mBioURL;
-    protected String mBioLocal;
+    protected static String mStoryTitle,  mTextURL, mTextLocal, mAudioURL, mAudioLocal,
+            mVideoURL, mVideoLocal, mEssayURL, mEssayLocal, mBioURL, mBioLocal;
 
     /**
      * The integers corresponding to the different tabs of the story
      */
-    private static final int TAB_TEXT = 0;
-    private static final int TAB_VIDEO = 1;
-    private static final int TAB_ESSAY = 2;
-    private static final int TAB_BIO = 3;
+    protected static final int TAB_TEXT = 0;
+    protected static final int TAB_VIDEO = 1;
+    protected static final int TAB_ESSAY = 2;
+    protected static final int TAB_BIO = 3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_story_tab);
+//        setContentView(R.layout.activity_story_tab);
         mStoryID = getData(ARG_STORY_ID, savedInstanceState);
         mStoryTitle = getData(ARG_STORY_TITLE, savedInstanceState);
         mTextLocal = getData(ARG_TEXT_LOCAL, savedInstanceState);
@@ -90,7 +74,7 @@ public class Story extends Activity {// implements ActionBar.TabListener {
 
         // Check which tabs should be active
         List<Integer> activeTabs = new ArrayList<Integer>();
-        if (exists(mTextURL)) activeTabs.add(TAB_TEXT);
+        if (exists(mTextURL) || exists(mAudioURL)) activeTabs.add(TAB_TEXT);
         if (exists(mVideoURL)) activeTabs.add(TAB_VIDEO);
         if (exists(mEssayURL)) activeTabs.add(TAB_ESSAY);
         if (exists(mBioURL)) activeTabs.add(TAB_BIO);
@@ -136,31 +120,31 @@ public class Story extends Activity {// implements ActionBar.TabListener {
                     actionBar.addTab(actionBar.newTab()
                             .setText(getPageTitle(tabId))
                             .setTabListener(new StoryTabListener<StoryDetailFragment>(
-                                    this, getPageTitle(tabId), StoryDetailFragment.class)));
+                                    this, "TAB"+tabId, StoryDetailFragment.class)));
                     break;
                 case TAB_VIDEO:
                     actionBar.addTab(actionBar.newTab()
                             .setText(getPageTitle(tabId))
                             .setTabListener(new StoryTabListener<StoryVideoFragment>(
-                                    this, getPageTitle(tabId), StoryVideoFragment.class)));
+                                    this, "TAB"+tabId, StoryVideoFragment.class)));
                     break;
                 case TAB_ESSAY:
                     actionBar.addTab(actionBar.newTab()
                             .setText(getPageTitle(tabId))
                             .setTabListener(new StoryTabListener<StoryEssayFragment>(
-                                    this, getPageTitle(tabId), StoryEssayFragment.class)));
+                                    this, "TAB"+tabId, StoryEssayFragment.class)));
                     break;
                 case TAB_BIO:
                     actionBar.addTab(actionBar.newTab()
                             .setText(getPageTitle(tabId))
                             .setTabListener(new StoryTabListener<StoryBioFragment>(
-                                    this, getPageTitle(tabId), StoryBioFragment.class)));
+                                    this, "TAB"+tabId, StoryBioFragment.class)));
             }
 
         }
     }
 
-    protected String getPageTitle(int position) {
+    private String getPageTitle(int position) {
         Locale l = Locale.getDefault();
         switch (position) {
             case TAB_TEXT:

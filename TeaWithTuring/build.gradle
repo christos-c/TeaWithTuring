@@ -3,7 +3,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:0.6.+'
+        classpath 'com.android.tools.build:gradle:0.7.+'
     }
 }
 apply plugin: 'android'
@@ -36,4 +36,5 @@ android {
 dependencies {
     compile 'com.android.support:support-v13:+'
     compile files('libs/QCAR.jar')
+    compile project(':showcaseview')
 }

@@ -23,9 +23,8 @@ import java.net.URL;
 public class StoryBioFragment extends Fragment {
     private ScrollView scrollView;
     private Bundle savedState = null;
-    private static StoryBioFragment bioFragment;
 
-    private static String bioText, mBioURL, mBioLocal, mStoryID;
+    private static String bioText;
 
     private static RetrieveTextTask retrieveTextTask;
     private static View rootView;
@@ -34,20 +33,20 @@ public class StoryBioFragment extends Fragment {
      * Returns a new instance of this fragment for the given section
      * number.
      */
-    public static StoryBioFragment newInstance(String remoteText, String localText,
-                                                 String storyID) {
-        mBioURL = remoteText;
-        mBioLocal = localText;
-        mStoryID = storyID;
-        if (bioFragment == null) {
-            bioFragment = new StoryBioFragment();
-            Bundle args = new Bundle();
-            args.putString(Story.ARG_BIO_URL, mBioURL);
-            args.putString(Story.ARG_BIO_LOCAL, mBioLocal);
-            bioFragment.setArguments(args);
-        }
-        return bioFragment;
-    }
+//    public static StoryBioFragment newInstance(String remoteText, String localText,
+//                                                 String storyID) {
+//        mBioURL = remoteText;
+//        mBioLocal = localText;
+//        mStoryID = storyID;
+//        if (bioFragment == null) {
+//            bioFragment = new StoryBioFragment();
+//            Bundle args = new Bundle();
+//            args.putString(Story.ARG_BIO_URL, mBioURL);
+//            args.putString(Story.ARG_BIO_LOCAL, mBioLocal);
+//            bioFragment.setArguments(args);
+//        }
+//        return bioFragment;
+//    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -76,7 +75,7 @@ public class StoryBioFragment extends Fragment {
             textView.setText(localStoryText);
         }
         else {
-            retrieveTextTask.execute(mBioURL, mBioLocal);
+            retrieveTextTask.execute(Story.mBioURL, Story.mBioLocal);
         }
         return rootView;
     }
@@ -106,13 +105,13 @@ public class StoryBioFragment extends Fragment {
         }
 
         protected String doInBackground(String... urls) {
-            String storyText = "";
+            String bioText = "";
             try {
                 URL url= new URL(urls[0]);
                 String local = urls[1];
                 if (local != null){
                     Log.d("ESSAY-LOAD", "Loading from file");
-                    storyText = DataStorage.readTextFromFile(local,
+                    bioText = DataStorage.readTextFromFile(local,
                             getActivity().getApplicationContext());
                 }
                 else {
@@ -121,14 +120,14 @@ public class StoryBioFragment extends Fragment {
                             new InputStreamReader(url.openStream()));
                     String str;
                     while ((str = in.readLine()) != null) {
-                        storyText += str+"\n";
+                        bioText += str+"\n";
                     }
                     in.close();
                 }
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            return storyText;
+            return bioText;
         }
 
         @Override
@@ -138,13 +137,13 @@ public class StoryBioFragment extends Fragment {
 
         protected void onPostExecute(String text) {
             //Create the name for the local file
-            if (mBioLocal == null){
-                mBioLocal = "TeaWithTuringStory"+mStoryID+"-bio";
-                DataStorage.saveTextToFile(text, mBioLocal,
+            if (Story.mBioLocal == null){
+                Story.mBioLocal = "TeaWithTuringStory"+Story.mStoryID+"-bio";
+                DataStorage.saveTextToFile(text, Story.mBioLocal,
                         getActivity().getApplicationContext());
                 ContentValues values = new ContentValues();
-                values.put(StoriesDatabase.StoryEntry.COLUMN_LOCAL_BIO, mBioLocal);
-                Uri uri = Uri.withAppendedPath(StoriesProvider.CONTENT_URI, mStoryID);
+                values.put(StoriesDatabase.StoryEntry.COLUMN_LOCAL_BIO, Story.mBioLocal);
+                Uri uri = Uri.withAppendedPath(StoriesProvider.CONTENT_URI, Story.mStoryID);
                 assert uri != null;
                 getActivity().getContentResolver().update(uri, values, null, null);
             }

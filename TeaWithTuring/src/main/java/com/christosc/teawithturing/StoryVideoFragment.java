@@ -1,6 +1,7 @@
 package com.christosc.teawithturing;
 
 import android.app.Fragment;
+import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -12,14 +13,16 @@ import android.widget.ProgressBar;
 import android.widget.VideoView;
 
 public class StoryVideoFragment extends Fragment {
-    private static StoryVideoFragment videoFragment;
     private static MediaController mediaController;
-    private static View rootView;
     private static VideoView videoView;
-//    private static ProgressBar loadingIndicator;
-    private static String videoURL, videoLocal;
+    private static Player player;
 
-    public static Fragment newInstance(String mVideoURL, String mVideoLocal) {
+    private Bundle savedState = null;
+
+    private static String tag = "INFO-VIDEO";
+    private View rootView;
+
+    /*public static Fragment newInstance(String mVideoURL, String mVideoLocal) {
         if (videoFragment == null){
             videoFragment = new StoryVideoFragment();
             Bundle args = new Bundle();
@@ -28,44 +31,48 @@ public class StoryVideoFragment extends Fragment {
             videoFragment.setArguments(args);
         }
         return videoFragment;
-    }
+    }*/
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Bundle args = getArguments();
-        videoURL = args.getString(Story.ARG_VIDEO_URL);
-        videoLocal = args.getString(Story.ARG_VIDEO_LOCAL);
-
         mediaController = new MediaController(getActivity());
-
+        player = new Player();
+        this.setRetainInstance(true);
     }
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_story_video, container, false);
         assert rootView != null;
-        videoView =(VideoView) rootView.findViewById(R.id.videoView);
-        new Player().execute(videoURL, videoLocal);
+
+        if (savedInstanceState != null || savedState != null) {
+            Log.d(tag, "Saved state");
+            if (savedInstanceState == null)
+                savedInstanceState = savedState;
+            videoView.seekTo(savedInstanceState.getInt("videoPos"));
+            Log.d(tag, "videoView "+((videoView == null) ? "" : "not ") + "null");
+            Log.d(tag, "mediaController "+((mediaController == null) ? "" : "not ") + "null");
+//            mediaController.setAnchorView(videoView);
+//            mediaController.setMediaPlayer(videoView);
+//            videoView.setMediaController(mediaController);
+//            videoView.setVisibility(View.VISIBLE);
+            mediaController.show();
+        }
+        else {
+            Log.d(tag, "New instance");
+            videoView = (VideoView) rootView.findViewById(R.id.videoView);
+            player.execute(Story.mVideoURL, Story.mVideoLocal);
+        }
         return rootView;
     }
 
-    public static void showVideo() {
-        mediaController.show();
-            /*videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-            public void onPrepared(MediaPlayer mp) {
-                View decorView = getActivity().getWindow().getDecorView();
-                // Hide the status bar.
-                int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
-                decorView.setSystemUiVisibility(uiOptions);
-                // Remember that you should never show the action bar if the
-                // status bar is hidden, so hide that too if necessary.
-                ActionBar actionBar = getActivity().getActionBar();
-                actionBar.hide();
-                getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-                videoView.start();
-            }
-        });*/
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        mediaController.hide();
+        savedState = new Bundle();
+        savedState.putInt("videoPos", videoView.getCurrentPosition());
     }
 
     class Player extends AsyncTask<String, Void, Boolean> {
@@ -73,7 +80,8 @@ public class StoryVideoFragment extends Fragment {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            Log.d("VIDEO", "Pre-execute player");
+            Log.d(tag, "Pre-execute player");
+            rootView.findViewById(R.id.video_progressBar).setVisibility(View.VISIBLE);
         }
 
         @Override
@@ -84,7 +92,7 @@ public class StoryVideoFragment extends Fragment {
                     // TODO Read from local file
                 }
                 else {
-                    Log.d("VIDEO", "Loading from "+urls[0]);
+                    Log.d(tag, "Loading from "+urls[0]);
                     videoView.setVideoPath(urls[0]);
                 }
                 prepared = true;
@@ -105,11 +113,20 @@ public class StoryVideoFragment extends Fragment {
         @Override
         protected void onPostExecute(Boolean result) {
             super.onPostExecute(result);
+            Log.d(tag, "Post-execute player");
             mediaController.setAnchorView(videoView);
             mediaController.setMediaPlayer(videoView);
             videoView.setMediaController(mediaController);
-//            videoView.requestFocus();
+
             videoView.setVisibility(View.VISIBLE);
+            videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                @Override
+                public void onPrepared(MediaPlayer mediaPlayer) {
+                    rootView.findViewById(R.id.video_progressBar).setVisibility(View.GONE);
+                    videoView.start();
+                    mediaController.show();
+                }
+            });
         }
     }
 }

@@ -5,7 +5,10 @@ import android.app.ActionBar.Tab;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
+import android.os.Bundle;
 import android.util.Log;
+import android.view.ViewGroup;
+import android.widget.LinearLayout;
 
 public class StoryTabListener<T extends Fragment> implements ActionBar.TabListener {
     private Fragment mFragment, mSecondFragment;
@@ -35,20 +38,20 @@ public class StoryTabListener<T extends Fragment> implements ActionBar.TabListen
             Log.d(tag, "Creating fragment " + mTag);
             mFragment = Fragment.instantiate(mActivity, mClass.getName());
             ft.add(android.R.id.content, mFragment, mTag);
-            //TODO Change this to text/audio
-            /*if (mTag.equals("album")) {
-                mSecondFragment = Fragment.instantiate(mActivity, SmallFragment.class.getName());
+            // Attach the audio tab to the text
+            if (mTag.equals("TAB"+Story.TAB_TEXT) && Story.exists(Story.mAudioURL)) {
+                mSecondFragment = Fragment.instantiate(mActivity,
+                        StoryAudioFragment.class.getName());
                 ft.add(android.R.id.content, mSecondFragment, mTag);
-            }*/
+            }
         } else {
             // If it exists, simply attach it in order to show it
             Log.d(tag, "Attaching fragment " + mTag);
             ft.attach(mFragment);
-            //TODO Change this to text/audio
-            /*if (mTag.equals("album")){
+            if (mTag.equals("TAB"+Story.TAB_TEXT) && Story.exists(Story.mAudioURL)) {
                 // Second fragment should exist
                 ft.attach(mSecondFragment);
-            }*/
+            }
         }
     }
 
@@ -57,7 +60,7 @@ public class StoryTabListener<T extends Fragment> implements ActionBar.TabListen
             Log.d(tag, "Detaching fragment " + mTag);
             // Detach the fragment, because another one is being attached
             ft.detach(mFragment);
-            if (mTag.equals("album")){
+            if (mTag.equals("TAB"+Story.TAB_TEXT) && Story.exists(Story.mAudioURL)) {
                 // Second fragment should exist
                 ft.detach(mSecondFragment);
             }

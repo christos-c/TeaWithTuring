@@ -21,8 +21,6 @@ import android.widget.SimpleCursorAdapter;
 import com.christosc.teawithturing.data.StoriesDatabase;
 import com.christosc.teawithturing.data.StoriesProvider;
 import com.christosc.teawithturing.storyScan.StoryScanActivity;
-import com.espian.showcaseview.ShowcaseView;
-import com.espian.showcaseview.targets.ViewTarget;
 
 public class StoryList extends ListActivity implements LoaderManager.LoaderCallbacks<Cursor> {
     // This is the Adapter being used to display the list's data
@@ -38,9 +36,9 @@ public class StoryList extends ListActivity implements LoaderManager.LoaderCallb
 
         //TODO Modify this accordingly (add it to Story.java)
         View showcasedView = findViewById(android.R.id.content);
-        ViewTarget target = new ViewTarget(showcasedView);
-        ShowcaseView.insertShowcaseView(target, this,
-                R.string.showcase_title, R.string.showcase_message);
+//        ViewTarget target = new ViewTarget(showcasedView);
+//        ShowcaseView.insertShowcaseView(target, this,
+//                R.string.showcase_title, R.string.showcase_message);
 
         // Create a progress bar to display while the list loads
         ProgressBar progressBar = new ProgressBar(this);

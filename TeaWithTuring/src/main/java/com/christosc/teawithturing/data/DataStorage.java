@@ -33,7 +33,7 @@ public class DataStorage {
 
     public static void saveTextToFile(String storyText, String fileName, Context context) {
         if (!isExternalStorageWritable()) return;
-        File file = new File(context.getExternalFilesDir(""),fileName);
+        File file = new File(context.getExternalFilesDir(""), fileName);
         try {
             BufferedWriter out = new BufferedWriter(new OutputStreamWriter(
                     new FileOutputStream(file)));
