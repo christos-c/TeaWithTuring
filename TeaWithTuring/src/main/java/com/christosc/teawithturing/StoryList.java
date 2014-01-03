@@ -13,6 +13,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -33,7 +34,6 @@ public class StoryList extends ListActivity implements LoaderManager.LoaderCallb
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         //TODO Modify this accordingly (add it to Story.java)
         View showcasedView = findViewById(android.R.id.content);
 //        ViewTarget target = new ViewTarget(showcasedView);

@@ -33,7 +33,7 @@ public class StoryDetailFragment extends Fragment {
     private static RetrieveTextTask retrieveTextTask;
     private static View rootView;
 
-    private static String tag = "INFO-TEXT/AUDIO";
+    private static String tag = "INFO-TEXT";
 
     /**
      * Returns a new instance of this fragment for the given section

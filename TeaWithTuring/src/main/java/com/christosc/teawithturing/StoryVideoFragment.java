@@ -1,6 +1,8 @@
 package com.christosc.teawithturing;
 
+import android.app.Activity;
 import android.app.Fragment;
+import android.content.res.Configuration;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -8,6 +10,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.MediaController;
 import android.widget.ProgressBar;
 import android.widget.VideoView;
@@ -22,6 +26,24 @@ public class StoryVideoFragment extends Fragment {
     private static String tag = "INFO-VIDEO";
     private View rootView;
 
+    /**
+     * Callback interface through which the fragment will report the
+     * task's progress and results back to the Activity.
+     */
+    /*public static interface VideoTaskCallbacks {
+        void onConfigurationChanged(Configuration newConfig);
+    }
+    private VideoTaskCallbacks callbacks;
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        callbacks = (VideoTaskCallbacks) activity;
+    }
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        callbacks = null;
+    }*/
     /*public static Fragment newInstance(String mVideoURL, String mVideoLocal) {
         if (videoFragment == null){
             videoFragment = new StoryVideoFragment();
@@ -46,6 +68,10 @@ public class StoryVideoFragment extends Fragment {
         rootView = inflater.inflate(R.layout.fragment_story_video, container, false);
         assert rootView != null;
 
+        if (getActivity().getResources().getConfiguration().orientation
+                == Configuration.ORIENTATION_LANDSCAPE)
+            setFullScreenMode();
+
         if (savedInstanceState != null || savedState != null) {
             Log.d(tag, "Saved state");
             if (savedInstanceState == null)
@@ -53,10 +79,6 @@ public class StoryVideoFragment extends Fragment {
             videoView.seekTo(savedInstanceState.getInt("videoPos"));
             Log.d(tag, "videoView "+((videoView == null) ? "" : "not ") + "null");
             Log.d(tag, "mediaController "+((mediaController == null) ? "" : "not ") + "null");
-//            mediaController.setAnchorView(videoView);
-//            mediaController.setMediaPlayer(videoView);
-//            videoView.setMediaController(mediaController);
-//            videoView.setVisibility(View.VISIBLE);
             mediaController.show();
         }
         else {
@@ -73,6 +95,31 @@ public class StoryVideoFragment extends Fragment {
         mediaController.hide();
         savedState = new Bundle();
         savedState.putInt("videoPos", videoView.getCurrentPosition());
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        if(newConfig.orientation==Configuration.ORIENTATION_LANDSCAPE){
+            Log.d(tag, "LANDSCAPE MODE");
+            setFullScreenMode();
+        }
+        else {
+            Log.d(tag, "PORTRAIT MODE");
+            WindowManager.LayoutParams attrs = getActivity().getWindow().getAttributes();
+            getActivity().getWindow().clearFlags(attrs.flags);
+            getActivity().getActionBar().show();
+        }
+    }
+
+    private void setFullScreenMode() {
+        WindowManager.LayoutParams attrs = getActivity().getWindow().getAttributes();
+        attrs.flags |= WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN |
+                WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS |
+                WindowManager.LayoutParams.FLAG_FULLSCREEN;
+        getActivity().getWindow().setAttributes(attrs);
+        getActivity().getActionBar().hide();
+//        rootView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
     }
 
     class Player extends AsyncTask<String, Void, Boolean> {

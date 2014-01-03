@@ -2,30 +2,34 @@ package com.christosc.teawithturing;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.content.res.Configuration;
+import android.graphics.Point;
 import android.os.Bundle;
 import android.support.v13.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
+import android.view.Display;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.ScrollView;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class Story extends Activity {// implements ActionBar.TabListener {
+public class Story extends Activity {
+// implements ActionBar.TabListener {
 
-    /**
-     * The {@link android.support.v4.view.PagerAdapter} that will provide
-     * fragments for each of the sections. We use a
-     * {@link FragmentPagerAdapter} derivative, which will keep every
-     * loaded fragment in memory. If this becomes too memory intensive, it
-     * may be best to switch to a
-     * {@link android.support.v13.app.FragmentStatePagerAdapter}.
-     */
 //    SectionsPagerAdapter mSectionsPagerAdapter;
 
     /**
      * The {@link ViewPager} that will host the section contents.
      */
 //    ViewPager mViewPager;
+
+    public static final String tag = "INFO-STORY";
 
     public static final String ARG_STORY_ID = "story_id";
     public static final String ARG_STORY_TITLE = "story_title";
@@ -52,6 +56,11 @@ public class Story extends Activity {// implements ActionBar.TabListener {
     protected static final int TAB_VIDEO = 1;
     protected static final int TAB_ESSAY = 2;
     protected static final int TAB_BIO = 3;
+
+    protected static int TEXT_HEIGHT = -1, TEXT_HEIGHT_LAND = -1;
+    private static View containerView;
+
+    private static ActionBar actionBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,7 +89,7 @@ public class Story extends Activity {// implements ActionBar.TabListener {
         if (exists(mBioURL)) activeTabs.add(TAB_BIO);
 
         // Set up the action bar.
-        final ActionBar actionBar = getActionBar();
+        actionBar = getActionBar();
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
         // Create the adapter that will return a fragment for each of the sections of the activity.
@@ -201,6 +210,56 @@ public class Story extends Activity {// implements ActionBar.TabListener {
     private String getData(String name, Bundle savedInstanceState){
         if (savedInstanceState != null) return savedInstanceState.getString(name);
         else return getIntent().getStringExtra(name);
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if (hasFocus)
+            resize();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        resize();
+    }
+
+    protected void resize() {
+        View textView = findViewById(R.id.story_scroller);
+        View audioView = findViewById(R.id.audio_panel);
+        if (containerView == null)
+            containerView = findViewById(android.R.id.content);
+        if (audioView != null) {
+            int tempTextHeight;
+            if (getResources().getConfiguration().orientation ==
+                    Configuration.ORIENTATION_LANDSCAPE) {
+                if (TEXT_HEIGHT_LAND == -1) {
+                    int screenWidth = containerView.getMeasuredWidth();
+                    int actionBarHeight = actionBar.getHeight();
+                    // If I use tempAudioHeight the text gets clipped
+                    tempTextHeight = screenWidth - actionBarHeight;
+                    TEXT_HEIGHT_LAND = tempTextHeight;
+                }
+                else {
+                    tempTextHeight = TEXT_HEIGHT_LAND;
+                }
+            }
+            else {
+                if (TEXT_HEIGHT == -1) {
+                    int tempAudioHeight = audioView.getMeasuredHeight();
+                    int screenHeight = containerView.getMeasuredHeight();
+                    tempTextHeight = screenHeight - tempAudioHeight;
+                    TEXT_HEIGHT = tempTextHeight;
+                }
+                else {
+                    tempTextHeight = TEXT_HEIGHT;
+                }
+            }
+            int textHeight = tempTextHeight;
+            Log.d(tag, "Changing height of text fragment to " + textHeight);
+            textView.getLayoutParams().height = textHeight;
+        }
     }
 
     //TODO Remove these if satisfied with static tabs without swipe

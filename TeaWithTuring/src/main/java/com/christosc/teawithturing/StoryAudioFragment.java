@@ -2,6 +2,7 @@ package com.christosc.teawithturing;
 
 import android.app.Fragment;
 import android.content.ContentValues;
+import android.content.res.Configuration;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnBufferingUpdateListener;
@@ -17,10 +18,13 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.SeekBar;
 
 import com.christosc.teawithturing.data.DataStorage;
@@ -46,6 +50,8 @@ public class StoryAudioFragment extends Fragment {
     private Player player;
 
     private Bundle savedState = null;
+
+    private static final String tag = "INFO-AUDIO";
 
     public StoryAudioFragment(){}
 
@@ -73,6 +79,24 @@ public class StoryAudioFragment extends Fragment {
                              Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_story_audio, container, false);
         assert rootView != null;
+
+        // Readjust the height of the text if there is audio
+        // This is only used when recreating the view (by TabListener)
+        ScrollView textView = (ScrollView) getActivity().findViewById(R.id.story_scroller);
+        if (textView != null) {
+            int height;
+            if (Story.TEXT_HEIGHT_LAND != -1 || Story.TEXT_HEIGHT != -1) {
+                if (getResources().getConfiguration().orientation ==
+                        Configuration.ORIENTATION_LANDSCAPE) {
+                    height = Story.TEXT_HEIGHT_LAND;
+                }
+                else {
+                    height = Story.TEXT_HEIGHT;
+                }
+                Log.d(tag, "Changing height of text fragment");
+                textView.getLayoutParams().height = height;
+            }
+        }
 
         imagePlayPause = (ImageView) rootView.findViewById(R.id.imagePlayPause);
         imagePlayPause.setOnClickListener(playPauseListener);
