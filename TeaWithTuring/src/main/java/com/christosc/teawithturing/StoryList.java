@@ -2,21 +2,18 @@ package com.christosc.teawithturing;
 
 import android.app.ListActivity;
 import android.app.LoaderManager;
+import android.content.ContentResolver;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.view.Gravity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.WindowManager;
-import android.widget.LinearLayout.LayoutParams;
 import android.widget.ListView;
-import android.widget.ProgressBar;
 import android.widget.SimpleCursorAdapter;
 
 import com.christosc.teawithturing.data.StoriesDatabase;
@@ -25,47 +22,105 @@ import com.christosc.teawithturing.storyScan.StoryScanActivity;
 
 public class StoryList extends ListActivity implements LoaderManager.LoaderCallbacks<Cursor> {
     // This is the Adapter being used to display the list's data
-    SimpleCursorAdapter mAdapter;
+    private static SimpleCursorAdapter mAdapter;
+    // This is used later by the sorting menu
+    private static ContentResolver contentResolver;
 
-    String[] PROJECTION = { StoriesDatabase.StoryEntry._ID,
+    // These are used to maintain the scroll position of the list
+//    private static int index = 0, top;
+    private ListView list;
+    private static Bundle savedInstance;
+    private static String sortKey = "title";
+
+    private static String tag = "INFO-LIST";
+
+    private static String[] PROJECTION = { StoriesDatabase.StoryEntry._ID,
             StoriesDatabase.StoryEntry.COLUMN_TITLE,
-            StoriesDatabase.StoryEntry.COLUMN_AUTHOR };
+            StoriesDatabase.StoryEntry.COLUMN_AUTHOR_SURNAME,
+            StoriesDatabase.StoryEntry.COLUMN_AUTHOR_NAME,
+            StoriesDatabase.StoryEntry.COLUMN_STORY_TYPE};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (savedInstance != null) savedInstanceState = savedInstance;
         //TODO Modify this accordingly (add it to Story.java)
-        View showcasedView = findViewById(android.R.id.content);
+//        View showcasedView = findViewById(android.R.id.content);
 //        ViewTarget target = new ViewTarget(showcasedView);
 //        ShowcaseView.insertShowcaseView(target, this,
 //                R.string.showcase_title, R.string.showcase_message);
 
-        // Create a progress bar to display while the list loads
-        ProgressBar progressBar = new ProgressBar(this);
-        progressBar.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT,
-                LayoutParams.WRAP_CONTENT, Gravity.CENTER));
-        progressBar.setIndeterminate(true);
-        getListView().setEmptyView(progressBar);
-
-        // Must add the progress bar to the root of the layout
-        ViewGroup root = (ViewGroup) findViewById(android.R.id.content);
-        root.addView(progressBar);
+        list = getListView();
 
         // For the cursor adapter, specify which columns go into which views
         String[] fromColumns = {StoriesDatabase.StoryEntry.COLUMN_TITLE,
-                StoriesDatabase.StoryEntry.COLUMN_AUTHOR};
+                StoriesDatabase.StoryEntry.COLUMN_AUTHOR_SURNAME};
         int[] toViews = {R.id.story_title, R.id.story_author};
 
         // Create an empty adapter we will use to display the loaded data.
         // We pass null for the cursor, then update it in onLoadFinished()
-        mAdapter = new SimpleCursorAdapter(this,
-                R.layout.activity_list_item, null,
-                fromColumns, toViews, 0);
+        Log.d(tag, "Creating adapter");
+        String sortBy = "";
+        if (savedInstanceState != null) {
+            sortBy = savedInstanceState.getString("sortBy");
+            Log.d(tag, "Instance state exists, sort-by: " + sortBy);
+            mAdapter = new TextAndImageCursorAdapter(this,
+                    R.layout.activity_list_item, getCursor(sortBy),
+                    fromColumns, toViews, 0);
+        }
+        else {
+            mAdapter = new TextAndImageCursorAdapter(this,
+                    R.layout.activity_list_item, null,
+                    fromColumns, toViews, 0);
+            // Prepare the loader.  Either re-connect with an existing one,
+            // or start a new one.
+            getLoaderManager().initLoader(0, null, this);
+        }
         setListAdapter(mAdapter);
 
-        // Prepare the loader.  Either re-connect with an existing one,
-        // or start a new one.
-        getLoaderManager().initLoader(0, null, this);
+        // We'll need this for the sorting function
+        contentResolver = getContentResolver();
+
+        if (savedInstanceState != null) {
+            int index = savedInstanceState.getInt("position");
+            list.setSelectionFromTop(index, 0);
+        }
+//        if (index !=0){
+//            Log.d(tag, "Resuming position " + index);
+//            list.setSelectionFromTop(index, top);
+//        }
+    }
+
+    /*@Override
+    public void onPause() {
+        super.onPause();
+        index = list.getFirstVisiblePosition();
+        View v = list.getChildAt(0);
+        top = (v == null) ? 0 : v.getTop();
+        Log.d(tag, "onPause, position " + index);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.d(tag, "onResume");
+        list.setSelectionFromTop(index, 0);
+    }*/
+
+    @Override
+    public void onPause() {
+        super.onDestroy();
+        Log.d(tag, "PAUSE - Saving state");
+        savedInstance = new Bundle();
+        savedInstance.putString("sortBy", sortKey);
+        savedInstance.putInt("position", list.getFirstVisiblePosition());
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle state) {
+        Log.d(tag, "SAVING INSTANCE");
+        state.putString("sortBy", sortKey);
+        state.putInt("position", list.getFirstVisiblePosition());
     }
 
     @Override
@@ -80,6 +135,7 @@ public class StoryList extends ListActivity implements LoaderManager.LoaderCallb
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
+        Log.d(tag, "Item ID: " + item.getItemId());
         switch (item.getItemId()) {
             case R.id.action_settings:
                 //TODO complete this
@@ -87,6 +143,15 @@ public class StoryList extends ListActivity implements LoaderManager.LoaderCallb
             case R.id.action_scan:
                 Intent intent = new Intent(this, StoryScanActivity.class);
                 startActivity(intent);
+                return true;
+            case SortActionProvider.SORT_TITLE:
+                sortBy("title");
+                return true;
+            case SortActionProvider.SORT_NAME:
+                sortBy("name");
+                return true;
+            case SortActionProvider.SORT_MARKER:
+                sortBy("marker");
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -105,6 +170,7 @@ public class StoryList extends ListActivity implements LoaderManager.LoaderCallb
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         // Swap the new cursor in.  (The framework will take care of closing the
         // old cursor once we return.)
+        Log.d(tag, "onLoaderFinished");
         mAdapter.swapCursor(data);
     }
 
@@ -113,6 +179,7 @@ public class StoryList extends ListActivity implements LoaderManager.LoaderCallb
         // This is called when the last Cursor provided to onLoadFinished()
         // above is about to be closed.  We need to make sure we are no
         // longer using it.
+        Log.d(tag, "onLoaderReset");
         mAdapter.swapCursor(null);
     }
 
@@ -127,7 +194,7 @@ public class StoryList extends ListActivity implements LoaderManager.LoaderCallb
     private Bundle getData(String storyId){
         Bundle args = new Bundle();
         String projection[] = { StoriesDatabase.StoryEntry._ID,
-                StoriesDatabase.StoryEntry.COLUMN_AUTHOR,
+                StoriesDatabase.StoryEntry.COLUMN_AUTHOR_SURNAME,
                 StoriesDatabase.StoryEntry.COLUMN_TITLE,
                 StoriesDatabase.StoryEntry.COLUMN_REMOTE_TEXT,
                 StoriesDatabase.StoryEntry.COLUMN_LOCAL_TEXT,
@@ -150,7 +217,7 @@ public class StoryList extends ListActivity implements LoaderManager.LoaderCallb
                     storyCursor.getColumnIndex(StoriesDatabase.StoryEntry._ID));
             args.putString(Story.ARG_STORY_ID, storyID);
             String storyAuthor = storyCursor.getString(
-                    storyCursor.getColumnIndex(StoriesDatabase.StoryEntry.COLUMN_AUTHOR));
+                    storyCursor.getColumnIndex(StoriesDatabase.StoryEntry.COLUMN_AUTHOR_SURNAME));
             args.putString(Story.ARG_STORY_AUTHOR, storyAuthor);
 
             String storyTitle = storyCursor.getString(
@@ -200,5 +267,26 @@ public class StoryList extends ListActivity implements LoaderManager.LoaderCallb
         }
         storyCursor.close();
         return args;
+    }
+
+    protected static void sortBy(String sortBy) {
+        sortKey = sortBy;
+        Cursor cursor = getCursor(sortBy);
+        if (cursor != null) mAdapter.changeCursor(cursor);
+    }
+
+    private static Cursor getCursor(String sortBy) {
+        Cursor cursor = null;
+        if (sortBy.isEmpty()) return null;
+        if (sortBy.equals("title"))
+            cursor = contentResolver.query(StoriesProvider.CONTENT_URI, PROJECTION,
+                    null, null, StoriesDatabase.StoryEntry.COLUMN_TITLE);
+        else if (sortBy.equals("name"))
+            cursor = contentResolver.query(StoriesProvider.CONTENT_URI, PROJECTION,
+                    null, null, StoriesDatabase.StoryEntry.COLUMN_AUTHOR_SURNAME);
+        else if (sortBy.equals("marker"))
+            cursor = contentResolver.query(StoriesProvider.CONTENT_URI, PROJECTION,
+                    null, null, StoriesDatabase.StoryEntry.COLUMN_STORY_TYPE);
+        return cursor;
     }
 }

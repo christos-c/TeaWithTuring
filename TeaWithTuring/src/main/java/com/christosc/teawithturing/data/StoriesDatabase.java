@@ -2,7 +2,6 @@ package com.christosc.teawithturing.data;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.res.Resources;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.provider.BaseColumns;
@@ -29,7 +28,8 @@ public final class StoriesDatabase extends SQLiteOpenHelper{
         public static final String TYPE_TEA = "tea";
 
         public static final String COLUMN_TITLE = "title";
-        public static final String COLUMN_AUTHOR = "author";
+        public static final String COLUMN_AUTHOR_SURNAME = "authorsurname";
+        public static final String COLUMN_AUTHOR_NAME = "authorname";
         public static final String COLUMN_REMOTE_TEXT = "remotetext";
         public static final String COLUMN_REMOTE_AUDIO = "remoteaudio";
         public static final String COLUMN_REMOTE_VIDEO = "remotevideo";
@@ -49,7 +49,8 @@ public final class StoriesDatabase extends SQLiteOpenHelper{
                     StoryEntry._ID + " INTEGER PRIMARY KEY," +
                     StoryEntry.COLUMN_STORY_TYPE + TEXT_TYPE + COMMA_SEP +
                     StoryEntry.COLUMN_TITLE + TEXT_TYPE + COMMA_SEP +
-                    StoryEntry.COLUMN_AUTHOR + TEXT_TYPE + COMMA_SEP +
+                    StoryEntry.COLUMN_AUTHOR_SURNAME + TEXT_TYPE + COMMA_SEP +
+                    StoryEntry.COLUMN_AUTHOR_NAME + TEXT_TYPE + COMMA_SEP +
                     StoryEntry.COLUMN_REMOTE_TEXT + TEXT_TYPE + COMMA_SEP +
                     StoryEntry.COLUMN_REMOTE_AUDIO + TEXT_TYPE + COMMA_SEP +
                     StoryEntry.COLUMN_REMOTE_VIDEO + TEXT_TYPE + COMMA_SEP +
@@ -103,8 +104,18 @@ public final class StoriesDatabase extends SQLiteOpenHelper{
                     String value = (splits.length > 1 ? splits[1] : "");
                     if (key.equals("TITLE"))
                         values.put(StoryEntry.COLUMN_TITLE, value);
-                    else if (key.equals("AUTHOR"))
-                        values.put(StoryEntry.COLUMN_AUTHOR, value);
+                    else if (key.equals("AUTHOR")) {
+                        // Split into name and surname and take care of middle names
+                        String[] names = value.split(" ");
+                        String surname  = names[names.length-1];
+                        String name = "";
+                        for (int i = 0; i < names.length-1; i++) {
+                            name += names[i];
+                            if (i < names.length-2) name += " ";
+                        }
+                        values.put(StoryEntry.COLUMN_AUTHOR_SURNAME, surname);
+                        values.put(StoryEntry.COLUMN_AUTHOR_NAME, name);
+                    }
                     else if (key.equals("TYPE"))
                         values.put(StoryEntry.COLUMN_STORY_TYPE, value);
                     else if (key.equals("TEXT"))

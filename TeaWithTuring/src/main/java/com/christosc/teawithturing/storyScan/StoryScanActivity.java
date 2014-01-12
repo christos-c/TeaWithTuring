@@ -696,7 +696,7 @@ public class StoryScanActivity extends Activity {
     private Bundle getData(String storyId){
         Bundle args = new Bundle();
         String projection[] = { StoriesDatabase.StoryEntry._ID,
-                StoriesDatabase.StoryEntry.COLUMN_AUTHOR,
+                StoriesDatabase.StoryEntry.COLUMN_AUTHOR_SURNAME,
                 StoriesDatabase.StoryEntry.COLUMN_TITLE,
                 StoriesDatabase.StoryEntry.COLUMN_REMOTE_TEXT,
                 StoriesDatabase.StoryEntry.COLUMN_LOCAL_TEXT,
@@ -714,7 +714,7 @@ public class StoryScanActivity extends Activity {
             String storyID = storyCursor.getString(
                     storyCursor.getColumnIndex(StoriesDatabase.StoryEntry._ID));
             String storyAuthor = storyCursor.getString(
-                    storyCursor.getColumnIndex(StoriesDatabase.StoryEntry.COLUMN_AUTHOR));
+                    storyCursor.getColumnIndex(StoriesDatabase.StoryEntry.COLUMN_AUTHOR_SURNAME));
             String storyTitle = storyCursor.getString(
                     storyCursor.getColumnIndex(StoriesDatabase.StoryEntry.COLUMN_TITLE));
             String textUrl = storyCursor.getString(
