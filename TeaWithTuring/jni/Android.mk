@@ -18,10 +18,8 @@ LOCAL_PATH := $(call my-dir)
 
 include $(CLEAR_VARS)
 LOCAL_MODULE := QCAR-prebuilt
-#LOCAL_SRC_FILES = ../libs/$(TARGET_ARCH_ABI)/libQCAR.so
-LOCAL_SRC_FILES = C:/Users/Chris/AndroidStudioProjects/TakeTeaWithTuring/TeaWithTuring/libs/$(TARGET_ARCH_ABI)/libQCAR.so
-#LOCAL_EXPORT_C_INCLUDES := /cygdrive/c/Users/Chris/AppData/Local/Android/android-studio/vuforia-sdk/build/include
-LOCAL_EXPORT_C_INCLUDES := C:/Users/Chris/AppData/Local/Android/android-studio/vuforia-sdk/build/include
+LOCAL_SRC_FILES = ../../ndk-build/lib/$(TARGET_ARCH_ABI)/libQCAR.so
+LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH)/../../ndk-build/include
 include $(PREBUILT_SHARED_LIBRARY)
 
 #-----------------------------------------------------------------------------

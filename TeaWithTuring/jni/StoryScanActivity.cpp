@@ -253,7 +253,7 @@ Java_com_christosc_teawithturing_storyScan_StoryScanActivityRenderer_renderFrame
         else {
             textureIndex = -1;
         }
-        SampleUtils::checkGlError("ImageTargets renderFrame");
+//        SampleUtils::checkGlError("ImageTargets renderFrame");
 		return textureIndex;
     }
 
@@ -452,14 +452,14 @@ Java_com_christosc_teawithturing_storyScan_StoryScanActivityRenderer_initRenderi
     // Define clear color
     glClearColor(0.0f, 0.0f, 0.0f, QCAR::requiresAlpha() ? 0.0f : 1.0f);
     
-#ifndef USE_OPENGL_ES_1_1
-    shaderProgramID     = SampleUtils::createProgramFromBuffer(cubeMeshVertexShader, cubeFragmentShader);
-    vertexHandle        = glGetAttribLocation(shaderProgramID, "vertexPosition");
-    normalHandle        = glGetAttribLocation(shaderProgramID, "vertexNormal");
-    textureCoordHandle  = glGetAttribLocation(shaderProgramID, "vertexTexCoord");
-    mvpMatrixHandle     = glGetUniformLocation(shaderProgramID, "modelViewProjectionMatrix");
-    texSampler2DHandle  = glGetUniformLocation(shaderProgramID, "texSampler2D");                                          
-#endif
+//#ifndef USE_OPENGL_ES_1_1
+//    shaderProgramID     = SampleUtils::createProgramFromBuffer(cubeMeshVertexShader, cubeFragmentShader);
+//    vertexHandle        = glGetAttribLocation(shaderProgramID, "vertexPosition");
+//    normalHandle        = glGetAttribLocation(shaderProgramID, "vertexNormal");
+//    textureCoordHandle  = glGetAttribLocation(shaderProgramID, "vertexTexCoord");
+//    mvpMatrixHandle     = glGetUniformLocation(shaderProgramID, "modelViewProjectionMatrix");
+//    texSampler2DHandle  = glGetUniformLocation(shaderProgramID, "texSampler2D");                                          
+//#endif
 }
 
 JNIEXPORT void JNICALL

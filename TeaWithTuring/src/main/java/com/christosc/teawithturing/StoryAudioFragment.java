@@ -1,6 +1,7 @@
 package com.christosc.teawithturing;
 
 import android.app.Fragment;
+import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.res.Configuration;
 import android.media.AudioManager;
@@ -18,12 +19,8 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.SeekBar;
 
@@ -42,7 +39,6 @@ public class StoryAudioFragment extends Fragment {
     private static ImageView imagePlayPause, buttonDownload;
     private static MediaPlayer mediaPlayer;
     private static SeekBar seekBarProgress;
-    private static ProgressBar loadingIndicator;
     private int audioLength;
 
     private Handler handler = new Handler();
@@ -52,6 +48,7 @@ public class StoryAudioFragment extends Fragment {
     private Bundle savedState = null;
 
     private static final String tag = "INFO-AUDIO";
+    private ProgressDialog progressDialog;
 
     public StoryAudioFragment(){}
 
@@ -108,8 +105,6 @@ public class StoryAudioFragment extends Fragment {
         seekBarProgress.setMax(99);
         seekBarProgress.setOnTouchListener(touchListener);
 
-        loadingIndicator = (ProgressBar) rootView.findViewById(R.id.audio_loading_indicator);
-
         if (Story.exists(Story.mAudioLocal)) buttonDownload.setVisibility(View.GONE);
 
         if (savedInstanceState != null || savedState != null) {
@@ -131,6 +126,8 @@ public class StoryAudioFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
+        if (mediaPlayer.isPlaying())
+            mediaPlayer.pause();
 //        if (mediaPlayer != null) {
 //            mediaPlayer.reset();
 //            mediaPlayer.release();
@@ -156,10 +153,16 @@ public class StoryAudioFragment extends Fragment {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            imagePlayPause.setVisibility(View.GONE);
-            buttonDownload.setVisibility(View.GONE);
-            seekBarProgress.setVisibility(View.GONE);
-            loadingIndicator.setVisibility(View.VISIBLE);
+            progressDialog = new ProgressDialog(getActivity());
+//            progressDialog.setTitle("Story Audio");
+            progressDialog.setMessage("Loading audio...");
+            progressDialog.setCancelable(false);
+            progressDialog.setIndeterminate(true);
+            progressDialog.show();
+//            imagePlayPause.setVisibility(View.GONE);
+//            buttonDownload.setVisibility(View.GONE);
+//            seekBarProgress.setVisibility(View.GONE);
+//            loadingIndicator.setVisibility(View.VISIBLE);
         }
 
         @Override
@@ -198,9 +201,10 @@ public class StoryAudioFragment extends Fragment {
         protected void onPostExecute(Boolean result) {
             super.onPostExecute(result);
             audioLength = mediaPlayer.getDuration();
-            loadingIndicator.setVisibility(View.GONE);
-            imagePlayPause.setVisibility(View.VISIBLE);
-            seekBarProgress.setVisibility(View.VISIBLE);
+            progressDialog.dismiss();
+//            loadingIndicator.setVisibility(View.GONE);
+//            imagePlayPause.setVisibility(View.VISIBLE);
+//            seekBarProgress.setVisibility(View.VISIBLE);
             if (Story.mAudioLocal == null)
                 buttonDownload.setVisibility(View.VISIBLE);
 

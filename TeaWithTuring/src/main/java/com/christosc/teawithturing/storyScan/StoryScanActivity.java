@@ -24,7 +24,6 @@ import android.widget.RelativeLayout;
 
 import com.christosc.teawithturing.R;
 import com.christosc.teawithturing.Story;
-import com.christosc.teawithturing.StoryList;
 import com.christosc.teawithturing.data.StoriesDatabase;
 import com.christosc.teawithturing.data.StoriesProvider;
 import com.qualcomm.QCAR.QCAR;
@@ -671,7 +670,7 @@ public class StoryScanActivity extends Activity {
             Bundle args = getData(String.valueOf(storyID));
 
             Log.d(TAG, "inResultFound");
-            Intent detailIntent = new Intent(this, StoryList.class);
+            Intent detailIntent = new Intent(this, Story.class);
             detailIntent.putExtras(args);
             startActivity(detailIntent);
         }
@@ -703,7 +702,11 @@ public class StoryScanActivity extends Activity {
                 StoriesDatabase.StoryEntry.COLUMN_REMOTE_AUDIO,
                 StoriesDatabase.StoryEntry.COLUMN_LOCAL_AUDIO,
                 StoriesDatabase.StoryEntry.COLUMN_REMOTE_VIDEO,
-                StoriesDatabase.StoryEntry.COLUMN_LOCAL_VIDEO
+                StoriesDatabase.StoryEntry.COLUMN_LOCAL_VIDEO,
+                StoriesDatabase.StoryEntry.COLUMN_REMOTE_ESSAY,
+                StoriesDatabase.StoryEntry.COLUMN_LOCAL_ESSAY,
+                StoriesDatabase.StoryEntry.COLUMN_REMOTE_BIO,
+                StoriesDatabase.StoryEntry.COLUMN_LOCAL_BIO
         };
         Uri uri = Uri.withAppendedPath(StoriesProvider.CONTENT_URI, storyId);
         assert uri != null;
@@ -713,37 +716,55 @@ public class StoryScanActivity extends Activity {
         if (storyCursor.moveToFirst()) {
             String storyID = storyCursor.getString(
                     storyCursor.getColumnIndex(StoriesDatabase.StoryEntry._ID));
+            args.putString(Story.ARG_STORY_ID, storyID);
             String storyAuthor = storyCursor.getString(
                     storyCursor.getColumnIndex(StoriesDatabase.StoryEntry.COLUMN_AUTHOR_SURNAME));
+            args.putString(Story.ARG_STORY_AUTHOR, storyAuthor);
+
             String storyTitle = storyCursor.getString(
                     storyCursor.getColumnIndex(StoriesDatabase.StoryEntry.COLUMN_TITLE));
-            String textUrl = storyCursor.getString(
-                    storyCursor.getColumnIndex(StoriesDatabase.StoryEntry.COLUMN_REMOTE_TEXT));
-            String textLocal = storyCursor.getString(
-                    storyCursor.getColumnIndex(StoriesDatabase.StoryEntry.COLUMN_LOCAL_TEXT));
-            String audioUrl = storyCursor.getString(
-                    storyCursor.getColumnIndex(StoriesDatabase.StoryEntry.COLUMN_REMOTE_AUDIO));
-            String audioLocal = storyCursor.getString(
-                    storyCursor.getColumnIndex(StoriesDatabase.StoryEntry.COLUMN_LOCAL_AUDIO));
-            String videoUrl = storyCursor.getString(
-                    storyCursor.getColumnIndex(StoriesDatabase.StoryEntry.COLUMN_REMOTE_VIDEO));
-            String videoLocal = storyCursor.getString(
-                    storyCursor.getColumnIndex(StoriesDatabase.StoryEntry.COLUMN_LOCAL_VIDEO));
-
-            args.putString(Story.ARG_STORY_ID, storyID);
-            args.putString(Story.ARG_STORY_AUTHOR, storyAuthor);
             args.putString(Story.ARG_STORY_TITLE, storyTitle);
-            args.putString(Story.ARG_TEXT_URL, textUrl);
-            if (textLocal != null && !textLocal.equals(""))
-                args.putString(Story.ARG_TEXT_LOCAL, textLocal);
-            if (audioUrl !=null && !audioUrl.equals(""))
-                args.putString(Story.ARG_AUDIO_URL, audioUrl);
-            if (audioLocal != null && !audioLocal.equals(""))
-                args.putString(Story.ARG_AUDIO_LOCAL, audioLocal);
-            if (videoUrl !=null && !videoUrl.equals(""))
-                args.putString(Story.ARG_VIDEO_URL, videoUrl);
-            if (videoLocal != null && !videoLocal.equals(""))
-                args.putString(Story.ARG_VIDEO_LOCAL, videoLocal);
+
+            String value = storyCursor.getString(
+                    storyCursor.getColumnIndex(StoriesDatabase.StoryEntry.COLUMN_REMOTE_TEXT));
+            if (value != null && !value.equals("")) args.putString(Story.ARG_TEXT_URL, value);
+
+            value = storyCursor.getString(
+                    storyCursor.getColumnIndex(StoriesDatabase.StoryEntry.COLUMN_LOCAL_TEXT));
+            if (value != null && !value.equals("")) args.putString(Story.ARG_TEXT_LOCAL, value);
+
+            value = storyCursor.getString(
+                    storyCursor.getColumnIndex(StoriesDatabase.StoryEntry.COLUMN_REMOTE_AUDIO));
+            if (value != null && !value.equals("")) args.putString(Story.ARG_AUDIO_URL, value);
+
+            value = storyCursor.getString(
+                    storyCursor.getColumnIndex(StoriesDatabase.StoryEntry.COLUMN_LOCAL_AUDIO));
+            if (value != null && !value.equals("")) args.putString(Story.ARG_AUDIO_LOCAL, value);
+
+            value = storyCursor.getString(
+                    storyCursor.getColumnIndex(StoriesDatabase.StoryEntry.COLUMN_REMOTE_VIDEO));
+            if (value != null && !value.equals("")) args.putString(Story.ARG_VIDEO_URL, value);
+
+            value = storyCursor.getString(
+                    storyCursor.getColumnIndex(StoriesDatabase.StoryEntry.COLUMN_LOCAL_VIDEO));
+            if (value != null && !value.equals("")) args.putString(Story.ARG_VIDEO_LOCAL, value);
+
+            value = storyCursor.getString(
+                    storyCursor.getColumnIndex(StoriesDatabase.StoryEntry.COLUMN_REMOTE_ESSAY));
+            if (value != null && !value.equals("")) args.putString(Story.ARG_ESSAY_URL, value);
+
+            value = storyCursor.getString(
+                    storyCursor.getColumnIndex(StoriesDatabase.StoryEntry.COLUMN_LOCAL_ESSAY));
+            if (value != null && !value.equals("")) args.putString(Story.ARG_ESSAY_LOCAL, value);
+
+            value = storyCursor.getString(
+                    storyCursor.getColumnIndex(StoriesDatabase.StoryEntry.COLUMN_REMOTE_BIO));
+            if (value != null && !value.equals("")) args.putString(Story.ARG_BIO_URL, value);
+
+            value = storyCursor.getString(
+                    storyCursor.getColumnIndex(StoriesDatabase.StoryEntry.COLUMN_LOCAL_BIO));
+            if (value != null && !value.equals("")) args.putString(Story.ARG_BIO_LOCAL, value);
+
         }
         storyCursor.close();
         return args;

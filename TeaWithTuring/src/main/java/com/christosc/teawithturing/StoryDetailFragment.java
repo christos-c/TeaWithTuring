@@ -141,6 +141,8 @@ public class StoryDetailFragment extends Fragment {
             } catch (Exception e) {
                 e.printStackTrace();
             }
+            if (storyText.isEmpty())
+                storyText = (String) getText(R.string.message_audio_only);
             return storyText;
         }
 

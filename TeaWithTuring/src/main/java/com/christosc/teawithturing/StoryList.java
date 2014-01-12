@@ -50,7 +50,9 @@ public class StoryList extends ListActivity implements LoaderManager.LoaderCallb
 //        ShowcaseView.insertShowcaseView(target, this,
 //                R.string.showcase_title, R.string.showcase_message);
 
+        // We'll need these for the sorting function
         list = getListView();
+        contentResolver = getContentResolver();
 
         // For the cursor adapter, specify which columns go into which views
         String[] fromColumns = {StoriesDatabase.StoryEntry.COLUMN_TITLE,
@@ -60,15 +62,15 @@ public class StoryList extends ListActivity implements LoaderManager.LoaderCallb
         // Create an empty adapter we will use to display the loaded data.
         // We pass null for the cursor, then update it in onLoadFinished()
         Log.d(tag, "Creating adapter");
-        String sortBy = "";
         if (savedInstanceState != null) {
-            sortBy = savedInstanceState.getString("sortBy");
+            String sortBy = savedInstanceState.getString("sortBy");
             Log.d(tag, "Instance state exists, sort-by: " + sortBy);
             mAdapter = new TextAndImageCursorAdapter(this,
                     R.layout.activity_list_item, getCursor(sortBy),
                     fromColumns, toViews, 0);
         }
         else {
+            Log.d(tag, "Instance state doesn't exist, default sorting by title");
             mAdapter = new TextAndImageCursorAdapter(this,
                     R.layout.activity_list_item, null,
                     fromColumns, toViews, 0);
@@ -77,9 +79,6 @@ public class StoryList extends ListActivity implements LoaderManager.LoaderCallb
             getLoaderManager().initLoader(0, null, this);
         }
         setListAdapter(mAdapter);
-
-        // We'll need this for the sorting function
-        contentResolver = getContentResolver();
 
         if (savedInstanceState != null) {
             int index = savedInstanceState.getInt("position");
@@ -116,12 +115,12 @@ public class StoryList extends ListActivity implements LoaderManager.LoaderCallb
         savedInstance.putInt("position", list.getFirstVisiblePosition());
     }
 
-    @Override
+    /*@Override
     public void onSaveInstanceState(Bundle state) {
         Log.d(tag, "SAVING INSTANCE");
         state.putString("sortBy", sortKey);
         state.putInt("position", list.getFirstVisiblePosition());
-    }
+    }*/
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -163,7 +162,7 @@ public class StoryList extends ListActivity implements LoaderManager.LoaderCallb
         // Now create and return a CursorLoader that will take care of
         // creating a Cursor for the data being displayed.
         return new CursorLoader(this, StoriesProvider.CONTENT_URI,
-                PROJECTION, null, null, null);
+                PROJECTION, null, null, StoriesDatabase.StoryEntry.COLUMN_TITLE);
     }
 
     // Called when a previously created loader has finished loading

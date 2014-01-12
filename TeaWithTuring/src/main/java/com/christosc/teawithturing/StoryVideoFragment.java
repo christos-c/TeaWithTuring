@@ -1,24 +1,28 @@
 package com.christosc.teawithturing;
 
-import android.app.Activity;
 import android.app.Fragment;
+import android.app.ProgressDialog;
 import android.content.res.Configuration;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.view.WindowManager;
 import android.widget.MediaController;
-import android.widget.ProgressBar;
-import android.widget.VideoView;
 
 public class StoryVideoFragment extends Fragment {
-    private static MediaController mediaController;
-    private static VideoView videoView;
+    // Shared with VideoView to keep the state
+    public static MediaPlayer mMediaPlayer;
+    public static Uri mUri;
+    public static MediaController mMediaController;
+    public static ProgressDialog progressDialog;
+    public static int mSeekWhenPrepared;
+
+    private static CustomVideoView videoView;
     private static Player player;
 
     private Bundle savedState = null;
@@ -58,9 +62,9 @@ public class StoryVideoFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mediaController = new MediaController(getActivity());
+        mMediaController = new MediaController(getActivity());
         player = new Player();
-        this.setRetainInstance(true);
+//        this.setRetainInstance(true);
     }
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -72,18 +76,20 @@ public class StoryVideoFragment extends Fragment {
                 == Configuration.ORIENTATION_LANDSCAPE)
             setFullScreenMode();
 
-        if (savedInstanceState != null || savedState != null) {
-            Log.d(tag, "Saved state");
-            if (savedInstanceState == null)
-                savedInstanceState = savedState;
-            videoView.seekTo(savedInstanceState.getInt("videoPos"));
-            Log.d(tag, "videoView "+((videoView == null) ? "" : "not ") + "null");
-            Log.d(tag, "mediaController "+((mediaController == null) ? "" : "not ") + "null");
-            mediaController.show();
+        if (savedInstanceState == null)
+            savedInstanceState = savedState;
+
+        if (savedInstanceState != null) {
+            int videoPos = savedInstanceState.getInt("videoPos");
+            Log.d(tag, "Saved state - video position: " + videoPos);
+//            videoView.setMediaController(mMediaController);
+            if (videoPos > 2000) videoPos -= 2000;
+            videoView.setSeekPos(videoPos);
+            progressDialog.show();
         }
         else {
             Log.d(tag, "New instance");
-            videoView = (VideoView) rootView.findViewById(R.id.videoView);
+            videoView = (CustomVideoView) rootView.findViewById(R.id.videoView);
             player.execute(Story.mVideoURL, Story.mVideoLocal);
         }
         return rootView;
@@ -92,7 +98,7 @@ public class StoryVideoFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        mediaController.hide();
+        mMediaController.hide();
         savedState = new Bundle();
         savedState.putInt("videoPos", videoView.getCurrentPosition());
     }
@@ -128,7 +134,13 @@ public class StoryVideoFragment extends Fragment {
         protected void onPreExecute() {
             super.onPreExecute();
             Log.d(tag, "Pre-execute player");
-            rootView.findViewById(R.id.video_progressBar).setVisibility(View.VISIBLE);
+            progressDialog = new ProgressDialog(getActivity());
+//            progressDialog.setTitle("Story Video");
+            progressDialog.setMessage("Loading video...");
+            progressDialog.setCancelable(false);
+            progressDialog.setIndeterminate(true);
+            progressDialog.show();
+            videoView.setVisibility(View.GONE);
         }
 
         @Override
@@ -144,7 +156,7 @@ public class StoryVideoFragment extends Fragment {
                 }
                 prepared = true;
             } catch (IllegalArgumentException e) {
-                Log.d("IllegarArgument", e.getMessage());
+                Log.d("IllegalArgument", e.getMessage());
                 prepared = false;
                 e.printStackTrace();
             } catch (SecurityException e) {
@@ -161,17 +173,20 @@ public class StoryVideoFragment extends Fragment {
         protected void onPostExecute(Boolean result) {
             super.onPostExecute(result);
             Log.d(tag, "Post-execute player");
-            mediaController.setAnchorView(videoView);
-            mediaController.setMediaPlayer(videoView);
-            videoView.setMediaController(mediaController);
-
+            Log.d(tag, "Video can " +((videoView.canPause())? "" : "not ") + "pause");
+//            progressDialog.dismiss();
+            mMediaController.setAnchorView(videoView);
+            mMediaController.setMediaPlayer(videoView);
+            videoView.setMediaController(mMediaController);
             videoView.setVisibility(View.VISIBLE);
+            videoView.setKeepScreenOn(true);
+
             videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                 @Override
                 public void onPrepared(MediaPlayer mediaPlayer) {
-                    rootView.findViewById(R.id.video_progressBar).setVisibility(View.GONE);
+                    progressDialog.dismiss();
                     videoView.start();
-                    mediaController.show();
+                    mMediaController.show();
                 }
             });
         }

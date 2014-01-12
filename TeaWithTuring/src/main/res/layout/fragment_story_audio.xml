@@ -6,13 +6,6 @@
     android:gravity="bottom"
     android:id="@+id/audio_container">
 
-    <ProgressBar
-        android:id="@+id/audio_loading_indicator"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        android:background="#ffffff" />
-
     <TableLayout
         android:paddingTop="@dimen/activity_horizontal_margin"
         android:paddingBottom="@dimen/activity_horizontal_margin"

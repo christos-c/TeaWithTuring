@@ -71,9 +71,9 @@ BIO	http://christos-c.com/turing/Entscheidungsproblem_by_Christos_Christodoulopo
 TITLE	G(in) & T(uring)
 AUTHOR	Viccy Adams
 TYPE	tea
-TEXT	http://christos-c.com/turing/G(in)_&_T(uring)_by_Viccy_Adams/text.txt
-ESSAY	http://christos-c.com/turing/G(in)_&_T(uring)_by_Viccy_Adams/essay.txt
-BIO	http://christos-c.com/turing/G(in)_&_T(uring)_by_Viccy_Adams/bio.txt
+TEXT	http://christos-c.com/turing/G(in)_T(uring)_by_Viccy_Adams/text.txt
+ESSAY	http://christos-c.com/turing/G(in)_T(uring)_by_Viccy_Adams/essay.txt
+BIO	http://christos-c.com/turing/G(in)_T(uring)_by_Viccy_Adams/bio.txt
 
 TITLE	Halt
 AUTHOR	Caroline Davison
@@ -132,9 +132,9 @@ TITLE	\Run?
 AUTHOR	Joshua Turner
 TYPE	desk
 AUDIO	http://christos-c.com/papers/entscheidungsproblem.mp3
-TEXT	http://christos-c.com/turing/\Run?_by_Joshua_Turner/text.txt
-ESSAY	http://christos-c.com/turing/\Run?_by_Joshua_Turner/essay.txt
-BIO	http://christos-c.com/turing/\Run?_by_Joshua_Turner/bio.txt
+TEXT	http://christos-c.com/turing/Run_by_Joshua_Turner/text.txt
+ESSAY	http://christos-c.com/turing/Run_by_Joshua_Turner/essay.txt
+BIO	http://christos-c.com/turing/Run_by_Joshua_Turner/bio.txt
 
 TITLE	Schneewittchen
 AUTHOR	Andrew McCallum
