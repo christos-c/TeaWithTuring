@@ -1,8 +1,13 @@
 package com.christosc.teawithturing;
 
 import android.app.Fragment;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
+import android.app.TaskStackBuilder;
 import android.content.ContentValues;
+import android.content.Context;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -12,6 +17,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -23,6 +29,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.SeekBar;
+import android.widget.Toast;
 
 import com.christosc.teawithturing.data.DataStorage;
 import com.christosc.teawithturing.data.StoriesDatabase;
@@ -36,8 +43,10 @@ import java.net.URLConnection;
 public class StoryAudioFragment extends Fragment {
     View rootView;
 
+    int mNotificationId = 1243;
+
     private static ImageView imagePlayPause, buttonDownload;
-    private static MediaPlayer mediaPlayer;
+    protected static MediaPlayer mediaPlayer;
     private static SeekBar seekBarProgress;
     private int audioLength;
 
@@ -100,12 +109,12 @@ public class StoryAudioFragment extends Fragment {
 
         buttonDownload = (ImageView) rootView.findViewById(R.id.buttonDownload);
         buttonDownload.setOnClickListener(downloadListener);
+        if (Story.mAudioLocal != null)
+            buttonDownload.setVisibility(View.GONE);
 
         seekBarProgress = (SeekBar)rootView.findViewById(R.id.seekBar);
         seekBarProgress.setMax(99);
         seekBarProgress.setOnTouchListener(touchListener);
-
-        if (Story.exists(Story.mAudioLocal)) buttonDownload.setVisibility(View.GONE);
 
         if (savedInstanceState != null || savedState != null) {
             if (savedInstanceState == null)
@@ -126,13 +135,8 @@ public class StoryAudioFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
-        if (mediaPlayer.isPlaying())
-            mediaPlayer.pause();
-//        if (mediaPlayer != null) {
-//            mediaPlayer.reset();
-//            mediaPlayer.release();
-//            mediaPlayer = null;
-//        }
+//        if (mediaPlayer.isPlaying())
+//            mediaPlayer.pause();
     }
 
     @Override
@@ -148,21 +152,46 @@ public class StoryAudioFragment extends Fragment {
         outState.putInt("audioPos", mediaPlayer.getCurrentPosition());
     }
 
+    protected void createNotification() {
+        NotificationCompat.Builder mBuilder =
+                new NotificationCompat.Builder(getActivity())
+                        .setSmallIcon(R.drawable.ic_action_download)
+                        .setContentTitle("Take Tea With Turing")
+                        .setContentText("Downloading audio from story: " + Story.mStoryTitle);
+        // Creates an explicit intent for an Activity in your app
+        Intent resultIntent = new Intent(getActivity(), StoryList.class);
+
+        // The stack builder object will contain an artificial back stack for the
+        // started Activity.
+        // This ensures that navigating backward from the Activity leads out of
+        // your application to the Home screen.
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(getActivity());
+        // Adds the back stack for the Intent (but not the Intent itself)
+        stackBuilder.addParentStack(StoryList.class);
+        // Adds the Intent that starts the Activity to the top of the stack
+        stackBuilder.addNextIntent(resultIntent);
+        PendingIntent resultPendingIntent =
+                stackBuilder.getPendingIntent(
+                        0,
+                        PendingIntent.FLAG_UPDATE_CURRENT
+                );
+        mBuilder.setContentIntent(resultPendingIntent);
+        NotificationManager mNotificationManager = (NotificationManager) getActivity().
+                getSystemService(Context.NOTIFICATION_SERVICE);
+        // mId allows you to update the notification later on.
+        mNotificationManager.notify(mNotificationId, mBuilder.build());
+    }
+
     class Player extends AsyncTask<String, Void, Boolean> {
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
             progressDialog = new ProgressDialog(getActivity());
-//            progressDialog.setTitle("Story Audio");
             progressDialog.setMessage("Loading audio...");
             progressDialog.setCancelable(false);
             progressDialog.setIndeterminate(true);
             progressDialog.show();
-//            imagePlayPause.setVisibility(View.GONE);
-//            buttonDownload.setVisibility(View.GONE);
-//            seekBarProgress.setVisibility(View.GONE);
-//            loadingIndicator.setVisibility(View.VISIBLE);
         }
 
         @Override
@@ -202,9 +231,6 @@ public class StoryAudioFragment extends Fragment {
             super.onPostExecute(result);
             audioLength = mediaPlayer.getDuration();
             progressDialog.dismiss();
-//            loadingIndicator.setVisibility(View.GONE);
-//            imagePlayPause.setVisibility(View.VISIBLE);
-//            seekBarProgress.setVisibility(View.VISIBLE);
             if (Story.mAudioLocal == null)
                 buttonDownload.setVisibility(View.VISIBLE);
 
@@ -216,11 +242,16 @@ public class StoryAudioFragment extends Fragment {
         private String audioLocal = "TeaWithTuringStory"+Story.mStoryID+"-audio";
 
         @Override
+        protected void onPreExecute() {
+            // Dim the download button
+            createNotification();
+            buttonDownload.getDrawable().setAlpha(128);
+        }
+
+        @Override
         protected Boolean doInBackground(String... urls) {
             try {
                 Log.d("AUDIO", "downloadListener beginning");
-//                Toast.makeText(getActivity(), getString(R.string.download_begin_msg),
-//                        Toast.LENGTH_SHORT).show();
                 URL url= new URL(urls[0]);
                 URLConnection con = url.openConnection();
 
@@ -238,10 +269,14 @@ public class StoryAudioFragment extends Fragment {
         protected void onPostExecute(Boolean result) {
             super.onPostExecute(result);
             Log.d("AUDIO", "downloadListener complete");
-//            Toast.makeText(getActivity(), getString(R.string.download_complete_msg),
-//                    Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), getString(R.string.download_complete_msg),
+                    Toast.LENGTH_SHORT).show();
+            NotificationManager mNotificationManager = (NotificationManager) getActivity().
+                    getSystemService(Context.NOTIFICATION_SERVICE);
+            mNotificationManager.cancel(mNotificationId);
             buttonDownload.setVisibility(View.GONE);
             //Update the database entry
+            Story.mAudioLocal = audioLocal;
             ContentValues values = new ContentValues();
             values.put(StoriesDatabase.StoryEntry.COLUMN_LOCAL_AUDIO, audioLocal);
             Uri uri = Uri.withAppendedPath(StoriesProvider.CONTENT_URI, Story.mStoryID);

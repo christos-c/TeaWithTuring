@@ -2,10 +2,16 @@ package com.christosc.teawithturing;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.app.TaskStackBuilder;
+import android.content.Context;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Point;
 import android.os.Bundle;
 import android.support.v13.app.FragmentPagerAdapter;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.Display;
@@ -46,7 +52,7 @@ public class Story extends Activity {
     public static final String ARG_BIO_LOCAL = "bio_local";
 
     protected static String mStoryID;
-    protected static String mStoryTitle,  mTextURL, mTextLocal, mAudioURL, mAudioLocal,
+    protected static String mStoryTitle, mTextURL, mTextLocal, mAudioURL, mAudioLocal,
             mVideoURL, mVideoLocal, mEssayURL, mEssayLocal, mBioURL, mBioLocal;
 
     /**

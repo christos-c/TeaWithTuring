@@ -26,5 +26,6 @@
     <string name="button_sort_by_marker">Sort by marker</string>
 
     <string name="message_audio_only">AUDIO ONLY</string>
+    <string name="download_complete_msg">Audio download complete</string>
 
 </resources>

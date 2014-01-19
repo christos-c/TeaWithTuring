@@ -72,6 +72,9 @@ public class StoryVideoFragment extends Fragment {
         rootView = inflater.inflate(R.layout.fragment_story_video, container, false);
         assert rootView != null;
 
+        if (StoryAudioFragment.mediaPlayer != null && StoryAudioFragment.mediaPlayer.isPlaying())
+            StoryAudioFragment.mediaPlayer.pause();
+
         if (getActivity().getResources().getConfiguration().orientation
                 == Configuration.ORIENTATION_LANDSCAPE)
             setFullScreenMode();
