@@ -2,24 +2,11 @@ package com.christosc.teawithturing;
 
 import android.app.ActionBar;
 import android.app.Activity;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.app.TaskStackBuilder;
-import android.content.Context;
-import android.content.Intent;
 import android.content.res.Configuration;
-import android.graphics.Point;
 import android.os.Bundle;
-import android.support.v13.app.FragmentPagerAdapter;
-import android.support.v4.app.NotificationCompat;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
-import android.view.Display;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
-import android.widget.ScrollView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -66,7 +53,7 @@ public class Story extends Activity {
     protected static int TEXT_HEIGHT = -1, TEXT_HEIGHT_LAND = -1;
     private static View containerView;
 
-    private static ActionBar actionBar;
+    private ActionBar actionBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -156,6 +143,23 @@ public class Story extends Activity {
                                     this, "TAB"+tabId, StoryBioFragment.class)));
             }
 
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (StoryAudioFragment.mediaPlayer != null) {
+            if (StoryAudioFragment.mediaPlayer.isPlaying())
+                StoryAudioFragment.mediaPlayer.stop();
+            StoryAudioFragment.mediaPlayer.release();
+            StoryAudioFragment.mediaPlayer = null;
+        }
+        if (StoryVideoFragment.mMediaPlayer != null) {
+            if (StoryVideoFragment.mMediaPlayer.isPlaying())
+                StoryVideoFragment.mMediaPlayer.stop();
+            StoryVideoFragment.mMediaPlayer.release();
+            StoryVideoFragment.mMediaPlayer = null;
         }
     }
 

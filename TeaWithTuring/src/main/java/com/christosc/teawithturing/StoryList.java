@@ -184,6 +184,7 @@ public class StoryList extends ListActivity implements LoaderManager.LoaderCallb
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
+        Log.d(tag, "Story " + id + " selected.");
         Intent detailIntent = new Intent(this, Story.class);
         Bundle args = getData(String.valueOf(id));
         detailIntent.putExtras(args);

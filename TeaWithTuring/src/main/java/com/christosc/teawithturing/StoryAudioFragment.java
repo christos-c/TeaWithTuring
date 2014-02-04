@@ -15,6 +15,7 @@ import android.media.MediaPlayer.OnBufferingUpdateListener;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.NotificationCompat;
@@ -26,7 +27,6 @@ import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.SeekBar;
 import android.widget.Toast;
@@ -48,7 +48,6 @@ public class StoryAudioFragment extends Fragment {
     private static ImageView imagePlayPause, buttonDownload;
     protected static MediaPlayer mediaPlayer;
     private static SeekBar seekBarProgress;
-    private int audioLength;
 
     private Handler handler = new Handler();
 
@@ -69,15 +68,13 @@ public class StoryAudioFragment extends Fragment {
         mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
         mediaPlayer.setOnBufferingUpdateListener(updateListener);
         mediaPlayer.setOnCompletionListener(new OnCompletionListener() {
-
             @Override
-            public void onCompletion(MediaPlayer mp) {
-                mediaPlayer.stop();
-                mediaPlayer.reset();
+            public void onCompletion(MediaPlayer mediaPlayer) {
+                mediaPlayer.seekTo(0);
+                imagePlayPause.setImageResource(R.drawable.ic_action_play);
             }
         });
         handler.postDelayed(runnable, 1000);
-
         player = new Player();
     }
 
@@ -116,10 +113,9 @@ public class StoryAudioFragment extends Fragment {
         seekBarProgress.setMax(99);
         seekBarProgress.setOnTouchListener(touchListener);
 
-        if (savedInstanceState != null || savedState != null) {
-            if (savedInstanceState == null)
-                savedInstanceState = savedState;
-            int pos = savedInstanceState.getInt("audioPos");
+        if (savedInstanceState == null)
+            savedInstanceState = savedState;
+        if (savedInstanceState != null) {
             // If the media player is playing while moving back to this tab,
             // switch to the pause button (instead of the default play)
             if (mediaPlayer.isPlaying())
@@ -155,27 +151,30 @@ public class StoryAudioFragment extends Fragment {
     protected void createNotification() {
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(getActivity())
-                        .setSmallIcon(R.drawable.ic_action_download)
+                        .setSmallIcon(R.drawable.ic_action_download_notification)
                         .setContentTitle("Take Tea With Turing")
                         .setContentText("Downloading audio from story: " + Story.mStoryTitle);
         // Creates an explicit intent for an Activity in your app
         Intent resultIntent = new Intent(getActivity(), StoryList.class);
 
-        // The stack builder object will contain an artificial back stack for the
-        // started Activity.
-        // This ensures that navigating backward from the Activity leads out of
-        // your application to the Home screen.
-        TaskStackBuilder stackBuilder = TaskStackBuilder.create(getActivity());
-        // Adds the back stack for the Intent (but not the Intent itself)
-        stackBuilder.addParentStack(StoryList.class);
-        // Adds the Intent that starts the Activity to the top of the stack
-        stackBuilder.addNextIntent(resultIntent);
-        PendingIntent resultPendingIntent =
-                stackBuilder.getPendingIntent(
-                        0,
-                        PendingIntent.FLAG_UPDATE_CURRENT
-                );
-        mBuilder.setContentIntent(resultPendingIntent);
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            // The stack builder object will contain an artificial back stack for the
+            // started Activity.
+            // This ensures that navigating backward from the Activity leads out of
+            // your application to the Home screen.
+            TaskStackBuilder stackBuilder = TaskStackBuilder.create(getActivity());
+            // Adds the back stack for the Intent (but not the Intent itself)
+            stackBuilder.addParentStack(StoryList.class);
+            // Adds the Intent that starts the Activity to the top of the stack
+            stackBuilder.addNextIntent(resultIntent);
+            PendingIntent resultPendingIntent =
+                    stackBuilder.getPendingIntent(
+                            0,
+                            PendingIntent.FLAG_UPDATE_CURRENT
+                    );
+            mBuilder.setContentIntent(resultPendingIntent);
+        }
+
         NotificationManager mNotificationManager = (NotificationManager) getActivity().
                 getSystemService(Context.NOTIFICATION_SERVICE);
         // mId allows you to update the notification later on.
@@ -229,11 +228,11 @@ public class StoryAudioFragment extends Fragment {
         @Override
         protected void onPostExecute(Boolean result) {
             super.onPostExecute(result);
-            audioLength = mediaPlayer.getDuration();
             progressDialog.dismiss();
             if (Story.mAudioLocal == null)
                 buttonDownload.setVisibility(View.VISIBLE);
-
+            else
+                seekBarProgress.setSecondaryProgress(100);
             Log.d("Prepared", "//" + result);
         }
     }
@@ -275,6 +274,7 @@ public class StoryAudioFragment extends Fragment {
                     getSystemService(Context.NOTIFICATION_SERVICE);
             mNotificationManager.cancel(mNotificationId);
             buttonDownload.setVisibility(View.GONE);
+            seekBarProgress.setSecondaryProgress(100);
             //Update the database entry
             Story.mAudioLocal = audioLocal;
             ContentValues values = new ContentValues();
@@ -321,7 +321,7 @@ public class StoryAudioFragment extends Fragment {
             if(v.getId() == R.id.seekBar) {
                 if(mediaPlayer.isPlaying()){
                     SeekBar sb = (SeekBar)v;
-                    int playPosition = (audioLength / 100) * sb.getProgress();
+                    int playPosition = (mediaPlayer.getDuration() / 100) * sb.getProgress();
                     mediaPlayer.seekTo(playPosition);
                 }
             }
@@ -333,7 +333,8 @@ public class StoryAudioFragment extends Fragment {
         @Override
         public void run() {
             if(mediaPlayer != null){
-                Double percentage =(((double)mediaPlayer.getCurrentPosition())/audioLength)*100;
+                double currentPos = (double) mediaPlayer.getCurrentPosition();
+                Double percentage =(currentPos/mediaPlayer.getDuration())*100;
                 seekBarProgress.setProgress(percentage.intValue());
             }
             handler.postDelayed(this, 1000);

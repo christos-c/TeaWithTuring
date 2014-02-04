@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/TakeTeaWithTuring.iml" filepath="$PROJECT_DIR$/TakeTeaWithTuring.iml" />
       <module fileurl="file://$PROJECT_DIR$/TeaWithTuring/TeaWithTuring.iml" filepath="$PROJECT_DIR$/TeaWithTuring/TeaWithTuring.iml" />
+      <module fileurl="file://$PROJECT_DIR$/TeaWithTuring2.iml" filepath="$PROJECT_DIR$/TeaWithTuring2.iml" />
       <module fileurl="file://$PROJECT_DIR$/showcaseview/showcaseview.iml" filepath="$PROJECT_DIR$/showcaseview/showcaseview.iml" />
     </modules>
   </component>

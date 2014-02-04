@@ -22,7 +22,7 @@ public class StoryVideoFragment extends Fragment {
     public static ProgressDialog progressDialog;
     public static int mSeekWhenPrepared;
 
-    private static CustomVideoView videoView;
+    private CustomVideoView videoView;
     private static Player player;
 
     private Bundle savedState = null;
@@ -64,7 +64,7 @@ public class StoryVideoFragment extends Fragment {
         super.onCreate(savedInstanceState);
         mMediaController = new MediaController(getActivity());
         player = new Player();
-//        this.setRetainInstance(true);
+        savedState = null;
     }
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
