@@ -9,6 +9,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.graphics.Point;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnBufferingUpdateListener;
@@ -20,6 +21,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+import android.util.TypedValue;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -76,6 +79,7 @@ public class StoryAudioFragment extends Fragment {
         });
         handler.postDelayed(runnable, 1000);
         player = new Player();
+        Log.d(tag, "Fragment created");
     }
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -87,6 +91,7 @@ public class StoryAudioFragment extends Fragment {
         // This is only used when recreating the view (by TabListener)
         ScrollView textView = (ScrollView) getActivity().findViewById(R.id.story_scroller);
         if (textView != null) {
+            Log.d(tag, "ScrollView exists");
             int height;
             if (Story.TEXT_HEIGHT_LAND != -1 || Story.TEXT_HEIGHT != -1) {
                 if (getResources().getConfiguration().orientation ==
@@ -125,6 +130,7 @@ public class StoryAudioFragment extends Fragment {
             player.execute(Story.mAudioURL, Story.mAudioLocal);
         }
 
+        Log.d(tag, "View created");
         return rootView;
     }
 
@@ -139,13 +145,11 @@ public class StoryAudioFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         savedState = new Bundle();
-        savedState.putInt("audioPos", mediaPlayer.getCurrentPosition());
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putInt("audioPos", mediaPlayer.getCurrentPosition());
     }
 
     protected void createNotification() {
@@ -332,7 +336,7 @@ public class StoryAudioFragment extends Fragment {
     private Runnable runnable = new Runnable() {
         @Override
         public void run() {
-            if(mediaPlayer != null){
+            if(mediaPlayer != null && mediaPlayer.isPlaying()){
                 double currentPos = (double) mediaPlayer.getCurrentPosition();
                 Double percentage =(currentPos/mediaPlayer.getDuration())*100;
                 seekBarProgress.setProgress(percentage.intValue());

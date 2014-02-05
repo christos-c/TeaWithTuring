@@ -1,12 +1,18 @@
 package com.christosc.teawithturing;
 
+import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.content.res.Configuration;
+import android.graphics.Point;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
+import android.util.TypedValue;
+import android.view.Display;
 import android.view.View;
+import android.view.ViewTreeObserver;
+import android.widget.ScrollView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,7 +57,6 @@ public class Story extends Activity {
     protected static final int TAB_BIO = 3;
 
     protected static int TEXT_HEIGHT = -1, TEXT_HEIGHT_LAND = -1;
-    private static View containerView;
 
     private ActionBar actionBar;
 
@@ -225,51 +230,54 @@ public class Story extends Activity {
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
-        if (hasFocus)
+        if (hasFocus) {
+            Log.d(tag, "onWindowFocusChanged");
             resize();
+        }
     }
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
+        Log.d(tag, "onConfigurationChanged");
         resize();
     }
 
-    protected void resize() {
-        View textView = findViewById(R.id.story_scroller);
+    public void resize() {
+        ScrollView textView = (ScrollView) findViewById(R.id.story_scroller);
         View audioView = findViewById(R.id.audio_panel);
-        if (containerView == null)
-            containerView = findViewById(android.R.id.content);
-        if (audioView != null) {
-            int tempTextHeight;
-            if (getResources().getConfiguration().orientation ==
-                    Configuration.ORIENTATION_LANDSCAPE) {
-                if (TEXT_HEIGHT_LAND == -1) {
-                    int screenWidth = containerView.getMeasuredWidth();
-                    int actionBarHeight = actionBar.getHeight();
-                    // If I use tempAudioHeight the text gets clipped
-                    tempTextHeight = screenWidth - actionBarHeight;
-                    TEXT_HEIGHT_LAND = tempTextHeight;
-                }
-                else {
-                    tempTextHeight = TEXT_HEIGHT_LAND;
-                }
+        if (audioView == null) return;
+        int textHeight;
+        int audioHeight = 0;
+        int screenHeight = 0;
+        int actionBarHeight = 0;
+
+        if (TEXT_HEIGHT == -1 || TEXT_HEIGHT_LAND == -1) {
+            Display display = getWindowManager().getDefaultDisplay();
+            Point size = new Point();
+            display.getSize(size);
+            screenHeight = size.y;
+            audioHeight = audioView.getMeasuredHeight();
+            TypedValue tv = new TypedValue();
+            if (getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
+                actionBarHeight = TypedValue.complexToDimensionPixelSize(tv.data,
+                        getResources().getDisplayMetrics());
             }
-            else {
-                if (TEXT_HEIGHT == -1) {
-                    int tempAudioHeight = audioView.getMeasuredHeight();
-                    int screenHeight = containerView.getMeasuredHeight();
-                    tempTextHeight = screenHeight - tempAudioHeight;
-                    TEXT_HEIGHT = tempTextHeight;
-                }
-                else {
-                    tempTextHeight = TEXT_HEIGHT;
-                }
-            }
-            int textHeight = tempTextHeight;
-            Log.d(tag, "Changing height of text fragment to " + textHeight);
-            textView.getLayoutParams().height = textHeight;
         }
+
+        if (getResources().getConfiguration().orientation ==
+                Configuration.ORIENTATION_LANDSCAPE) {
+            if (TEXT_HEIGHT_LAND == -1)
+                TEXT_HEIGHT_LAND = (int) (screenHeight - audioHeight - (Math.round(1.6*actionBarHeight)));
+            textHeight = TEXT_HEIGHT_LAND;
+        }
+        else {
+            if (TEXT_HEIGHT == -1)
+                TEXT_HEIGHT = (int) (screenHeight - audioHeight - (Math.round(2.3*actionBarHeight)));
+            textHeight = TEXT_HEIGHT;
+        }
+        Log.d(tag, "Changing height of text fragment to " + textHeight);
+        textView.getLayoutParams().height = textHeight;
     }
 
     //TODO Remove these if satisfied with static tabs without swipe

@@ -115,12 +115,12 @@ public class StoryList extends ListActivity implements LoaderManager.LoaderCallb
         savedInstance.putInt("position", list.getFirstVisiblePosition());
     }
 
-    /*@Override
+    @Override
     public void onSaveInstanceState(Bundle state) {
         Log.d(tag, "SAVING INSTANCE");
         state.putString("sortBy", sortKey);
         state.putInt("position", list.getFirstVisiblePosition());
-    }*/
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

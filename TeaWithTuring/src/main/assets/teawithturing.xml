@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<QCARConfig xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="qcar_config.xsd">
+  <Tracking>
+    <ImageTarget name="marker_trees" size="65.000000 47.105263" />
+    <ImageTarget name="marker_tea" size="55.000000 45.309525" />
+    <ImageTarget name="marker_desk" size="42.000000 45.698112" />
+  </Tracking>
+</QCARConfig>
