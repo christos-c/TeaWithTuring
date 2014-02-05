@@ -95,13 +95,9 @@ public class StoryAudioFragment extends Fragment {
             int height;
             if (Story.TEXT_HEIGHT_LAND != -1 || Story.TEXT_HEIGHT != -1) {
                 if (getResources().getConfiguration().orientation ==
-                        Configuration.ORIENTATION_LANDSCAPE) {
-                    height = Story.TEXT_HEIGHT_LAND;
-                }
-                else {
-                    height = Story.TEXT_HEIGHT;
-                }
-                Log.d(tag, "Changing height of text fragment");
+                        Configuration.ORIENTATION_LANDSCAPE) height = Story.TEXT_HEIGHT_LAND;
+                else height = Story.TEXT_HEIGHT;
+                Log.d(tag, "Changing height of text fragment to " + height);
                 textView.getLayoutParams().height = height;
             }
         }

@@ -1,6 +1,5 @@
 package com.christosc.teawithturing;
 
-import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.content.res.Configuration;
@@ -11,7 +10,6 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.View;
-import android.view.ViewTreeObserver;
 import android.widget.ScrollView;
 
 import java.util.ArrayList;
@@ -58,8 +56,6 @@ public class Story extends Activity {
 
     protected static int TEXT_HEIGHT = -1, TEXT_HEIGHT_LAND = -1;
 
-    private ActionBar actionBar;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -87,7 +83,8 @@ public class Story extends Activity {
         if (exists(mBioURL)) activeTabs.add(TAB_BIO);
 
         // Set up the action bar.
-        actionBar = getActionBar();
+        ActionBar actionBar = getActionBar();
+        assert actionBar != null;
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
         // Create the adapter that will return a fragment for each of the sections of the activity.
@@ -127,25 +124,25 @@ public class Story extends Activity {
                     actionBar.addTab(actionBar.newTab()
                             .setText(getPageTitle(tabId))
                             .setTabListener(new StoryTabListener<StoryDetailFragment>(
-                                    this, "TAB"+tabId, StoryDetailFragment.class)));
+                                    this, "TAB" + tabId, StoryDetailFragment.class)));
                     break;
                 case TAB_VIDEO:
                     actionBar.addTab(actionBar.newTab()
                             .setText(getPageTitle(tabId))
                             .setTabListener(new StoryTabListener<StoryVideoFragment>(
-                                    this, "TAB"+tabId, StoryVideoFragment.class)));
+                                    this, "TAB" + tabId, StoryVideoFragment.class)));
                     break;
                 case TAB_ESSAY:
                     actionBar.addTab(actionBar.newTab()
                             .setText(getPageTitle(tabId))
                             .setTabListener(new StoryTabListener<StoryEssayFragment>(
-                                    this, "TAB"+tabId, StoryEssayFragment.class)));
+                                    this, "TAB" + tabId, StoryEssayFragment.class)));
                     break;
                 case TAB_BIO:
                     actionBar.addTab(actionBar.newTab()
                             .setText(getPageTitle(tabId))
                             .setTabListener(new StoryTabListener<StoryBioFragment>(
-                                    this, "TAB"+tabId, StoryBioFragment.class)));
+                                    this, "TAB" + tabId, StoryBioFragment.class)));
             }
 
         }
@@ -244,10 +241,8 @@ public class Story extends Activity {
     }
 
     public void resize() {
-        ScrollView textView = (ScrollView) findViewById(R.id.story_scroller);
         View audioView = findViewById(R.id.audio_panel);
         if (audioView == null) return;
-        int textHeight;
         int audioHeight = 0;
         int screenHeight = 0;
         int actionBarHeight = 0;
@@ -265,6 +260,7 @@ public class Story extends Activity {
             }
         }
 
+        int textHeight;
         if (getResources().getConfiguration().orientation ==
                 Configuration.ORIENTATION_LANDSCAPE) {
             if (TEXT_HEIGHT_LAND == -1)
@@ -277,7 +273,9 @@ public class Story extends Activity {
             textHeight = TEXT_HEIGHT;
         }
         Log.d(tag, "Changing height of text fragment to " + textHeight);
+        View textView = findViewById(R.id.story_scroller);
         textView.getLayoutParams().height = textHeight;
+        textView.requestLayout();
     }
 
     //TODO Remove these if satisfied with static tabs without swipe
