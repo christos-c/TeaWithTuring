@@ -9,7 +9,6 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/TeaWithTuring" />
-            <option value="$PROJECT_DIR$/showcaseview" />
           </set>
         </option>
       </GradleProjectSettings>

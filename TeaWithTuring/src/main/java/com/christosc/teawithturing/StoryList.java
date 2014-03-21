@@ -84,27 +84,7 @@ public class StoryList extends ListActivity implements LoaderManager.LoaderCallb
             int index = savedInstanceState.getInt("position");
             list.setSelectionFromTop(index, 0);
         }
-//        if (index !=0){
-//            Log.d(tag, "Resuming position " + index);
-//            list.setSelectionFromTop(index, top);
-//        }
     }
-
-    /*@Override
-    public void onPause() {
-        super.onPause();
-        index = list.getFirstVisiblePosition();
-        View v = list.getChildAt(0);
-        top = (v == null) ? 0 : v.getTop();
-        Log.d(tag, "onPause, position " + index);
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        Log.d(tag, "onResume");
-        list.setSelectionFromTop(index, 0);
-    }*/
 
     @Override
     public void onPause() {
@@ -136,9 +116,6 @@ public class StoryList extends ListActivity implements LoaderManager.LoaderCallb
         // as you specify a parent activity in AndroidManifest.xml.
         Log.d(tag, "Item ID: " + item.getItemId());
         switch (item.getItemId()) {
-            case R.id.action_settings:
-                //TODO complete this
-                return true;
             case R.id.action_scan:
                 Intent intent = new Intent(this, StoryScanActivity.class);
                 startActivity(intent);
@@ -151,6 +128,10 @@ public class StoryList extends ListActivity implements LoaderManager.LoaderCallb
                 return true;
             case SortActionProvider.SORT_MARKER:
                 sortBy("marker");
+                return true;
+            case R.id.action_about:
+                Intent intentAbout = new Intent(this, AboutActivity.class);
+                startActivity(intentAbout);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

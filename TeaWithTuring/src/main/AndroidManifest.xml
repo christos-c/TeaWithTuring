@@ -20,12 +20,16 @@
         android:label="@string/app_name_short"
         android:theme="@style/AppTheme" >
         <activity
-            android:name="com.christosc.teawithturing.StoryList"
+            android:name="com.christosc.teawithturing.SplashScreen"
             android:label="@string/app_name_short" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name="com.christosc.teawithturing.StoryList"
+            android:label="@string/action_list" >
         </activity>
         <activity
             android:name="com.christosc.teawithturing.Story"
@@ -38,11 +42,15 @@
         </activity>
         <activity
             android:name=".storyScan.StoryScanActivity"
-            android:label="@string/action_scan"
-            android:parentActivityName=".StoryList" >
+            android:label="@string/action_scan" >
+        </activity>
+        <activity
+            android:name="com.christosc.teawithturing.AboutActivity"
+            android:label="@string/action_about"
+            android:parentActivityName=".storyScan.StoryScanActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".StoryList" />
+                android:value=".storyScan.StoryScanActivity" />
         </activity>
         <provider
             android:authorities="com.christosc.teawithturing.data.StoriesProvider"

@@ -17,13 +17,17 @@ import android.os.Message;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.view.WindowManager;
 import android.widget.RelativeLayout;
 
+import com.christosc.teawithturing.AboutActivity;
 import com.christosc.teawithturing.R;
 import com.christosc.teawithturing.Story;
+import com.christosc.teawithturing.StoryList;
 import com.christosc.teawithturing.data.StoriesDatabase;
 import com.christosc.teawithturing.data.StoriesProvider;
 import com.qualcomm.QCAR.QCAR;
@@ -263,6 +267,32 @@ public class StoryScanActivity extends Activity {
         mQCARFlags = getInitializationFlags();
         // Update the application status to start initializing application:
         updateApplicationStatus(APPSTATUS_INIT_APP);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.story_scan, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here.
+        switch (item.getItemId()) {
+            case R.id.action_list:
+                onDestroy();
+                Intent intent = new Intent(this, StoryList.class);
+                startActivity(intent);
+                return true;
+            case R.id.action_about:
+                onDestroy();
+                Intent intentAbout = new Intent(this, AboutActivity.class);
+                startActivity(intentAbout);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     private void getStoryIDs(){

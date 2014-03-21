@@ -1,6 +1,7 @@
 package com.christosc.teawithturing;
 
 import android.app.Fragment;
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
@@ -9,7 +10,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.graphics.Point;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnBufferingUpdateListener;
@@ -19,10 +19,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.app.NotificationCompat;
 import android.util.Log;
-import android.util.TypedValue;
-import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -149,8 +146,8 @@ public class StoryAudioFragment extends Fragment {
     }
 
     protected void createNotification() {
-        NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(getActivity())
+        Notification.Builder mBuilder =
+                new Notification.Builder(getActivity())
                         .setSmallIcon(R.drawable.ic_action_download_notification)
                         .setContentTitle("Take Tea With Turing")
                         .setContentText("Downloading audio from story: " + Story.mStoryTitle);
