@@ -1,7 +1,17 @@
 package com.christosc.teawithturing;
 
-/**
- * Created by christos on 3/20/14.
- */
-public class AboutActivity {
+import android.app.Activity;
+import android.os.Bundle;
+import android.webkit.WebView;
+
+public class AboutActivity extends Activity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        WebView webView = new WebView(this);
+        setContentView(webView);
+
+        webView.loadUrl("file:///android_asset/about.html");
+    }
 }
