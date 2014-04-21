@@ -3,12 +3,9 @@ package com.christosc.teawithturing;
 import android.app.Fragment;
 import android.app.Notification;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.ProgressDialog;
-import android.app.TaskStackBuilder;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.Intent;
 import android.content.res.Configuration;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -16,7 +13,6 @@ import android.media.MediaPlayer.OnBufferingUpdateListener;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -152,30 +148,29 @@ public class StoryAudioFragment extends Fragment {
                         .setContentTitle("Take Tea With Turing")
                         .setContentText("Downloading audio from story: " + Story.mStoryTitle);
         // Creates an explicit intent for an Activity in your app
-        Intent resultIntent = new Intent(getActivity(), StoryList.class);
+//        Intent resultIntent = new Intent(getActivity(), StoryList.class);
 
-        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-            // The stack builder object will contain an artificial back stack for the
-            // started Activity.
-            // This ensures that navigating backward from the Activity leads out of
-            // your application to the Home screen.
-            TaskStackBuilder stackBuilder = TaskStackBuilder.create(getActivity());
-            // Adds the back stack for the Intent (but not the Intent itself)
-            stackBuilder.addParentStack(StoryList.class);
-            // Adds the Intent that starts the Activity to the top of the stack
-            stackBuilder.addNextIntent(resultIntent);
-            PendingIntent resultPendingIntent =
-                    stackBuilder.getPendingIntent(
-                            0,
-                            PendingIntent.FLAG_UPDATE_CURRENT
-                    );
-            mBuilder.setContentIntent(resultPendingIntent);
-        }
+//        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+//            // The stack builder object will contain an artificial back stack for the
+//            // started Activity.
+//            // This ensures that navigating backward from the Activity leads out of
+//            // your application to the Home screen.
+//            TaskStackBuilder stackBuilder = TaskStackBuilder.create(getActivity());
+//            // Adds the back stack for the Intent (but not the Intent itself)
+//            stackBuilder.addParentStack(StoryList.class);
+//            // Adds the Intent that starts the Activity to the top of the stack
+//            stackBuilder.addNextIntent(resultIntent);
+//            PendingIntent resultPendingIntent =
+//                    stackBuilder.getPendingIntent(0,
+//                            PendingIntent.FLAG_UPDATE_CURRENT
+//                    );
+//            mBuilder.setContentIntent(resultPendingIntent);
+//        }
 
         NotificationManager mNotificationManager = (NotificationManager) getActivity().
                 getSystemService(Context.NOTIFICATION_SERVICE);
         // mId allows you to update the notification later on.
-        mNotificationManager.notify(mNotificationId, mBuilder.build());
+        mNotificationManager.notify(mNotificationId, mBuilder.getNotification());
     }
 
     class Player extends AsyncTask<String, Void, Boolean> {
@@ -242,6 +237,7 @@ public class StoryAudioFragment extends Fragment {
             // Dim the download button
             createNotification();
             buttonDownload.getDrawable().setAlpha(128);
+            buttonDownload.setClickable(false);
         }
 
         @Override

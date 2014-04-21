@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.database.Cursor;
@@ -261,6 +262,21 @@ public class StoryScanActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         Log.d(TAG, "StoryScanActiviy::onCreate");
         super.onCreate(savedInstanceState);
+
+        final String PREFS_NAME = "MyPrefsFile";
+
+        SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+
+        if (settings.getBoolean("my_first_time", true)) {
+            //the app is being launched for first time, do something
+            Log.d(TAG, "First time");
+            // record the fact that the app has been started at least once
+            settings.edit().putBoolean("my_first_time", false).commit();
+
+            // first time task
+            Intent infoIntent = new Intent(this, AboutActivity.class);
+            startActivity(infoIntent);
+        }
         // Get a list of story IDs
         getStoryIDs();
         // Query the QCAR initialization flags:
@@ -286,7 +302,7 @@ public class StoryScanActivity extends Activity {
                 startActivity(intent);
                 return true;
             case R.id.action_about:
-                onDestroy();
+                onPause();
                 Intent intentAbout = new Intent(this, AboutActivity.class);
                 startActivity(intentAbout);
                 return true;
@@ -364,12 +380,18 @@ public class StoryScanActivity extends Activity {
     protected void onResume() {
         Log.d(TAG, "StoryScanActivity::onResume");
         super.onResume();
-        // QCAR-specific resume operation
-        QCAR.onResume();
-        // We may start the camera only if the QCAR SDK has already been initialized
+
         if (mAppStatus == APPSTATUS_CAMERA_STOPPED) {
-            updateApplicationStatus(APPSTATUS_CAMERA_RUNNING);
+            mQCARFlags = getInitializationFlags();
+            // Update the application status to start initializing application:
+            updateApplicationStatus(APPSTATUS_INIT_APP);
         }
+//        // QCAR-specific resume operation
+//        QCAR.onResume();
+//        // We may start the camera only if the QCAR SDK has already been initialized
+//        if (mAppStatus == APPSTATUS_CAMERA_STOPPED) {
+//            updateApplicationStatus(APPSTATUS_CAMERA_RUNNING);
+//        }
     }
 
     private void updateActivityOrientation() {
@@ -404,12 +426,13 @@ public class StoryScanActivity extends Activity {
     protected void onPause() {
         Log.d(TAG, "StoryScanActivity::onPause");
         super.onPause();
-
-        if (mAppStatus == APPSTATUS_CAMERA_RUNNING) {
-            updateApplicationStatus(APPSTATUS_CAMERA_STOPPED);
-        }
-        // QCAR-specific pause operation
-        QCAR.onPause();
+        updateApplicationStatus(APPSTATUS_CAMERA_STOPPED);
+        onDestroy();
+//        if (mAppStatus == APPSTATUS_CAMERA_RUNNING) {
+//            updateApplicationStatus(APPSTATUS_CAMERA_STOPPED);
+//        }
+//        // QCAR-specific pause operation
+//        QCAR.onPause();
     }
 
     /** Native function to deinitialize the application. */
