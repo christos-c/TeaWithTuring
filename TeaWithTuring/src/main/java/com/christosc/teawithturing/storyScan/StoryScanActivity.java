@@ -263,20 +263,6 @@ public class StoryScanActivity extends Activity {
         Log.d(TAG, "StoryScanActiviy::onCreate");
         super.onCreate(savedInstanceState);
 
-        final String PREFS_NAME = "MyPrefsFile";
-
-        SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
-
-        if (settings.getBoolean("my_first_time", true)) {
-            //the app is being launched for first time, do something
-            Log.d(TAG, "First time");
-            // record the fact that the app has been started at least once
-            settings.edit().putBoolean("my_first_time", false).commit();
-
-            // first time task
-            Intent infoIntent = new Intent(this, AboutActivity.class);
-            startActivity(infoIntent);
-        }
         // Get a list of story IDs
         getStoryIDs();
         // Query the QCAR initialization flags:
@@ -386,12 +372,6 @@ public class StoryScanActivity extends Activity {
             // Update the application status to start initializing application:
             updateApplicationStatus(APPSTATUS_INIT_APP);
         }
-//        // QCAR-specific resume operation
-//        QCAR.onResume();
-//        // We may start the camera only if the QCAR SDK has already been initialized
-//        if (mAppStatus == APPSTATUS_CAMERA_STOPPED) {
-//            updateApplicationStatus(APPSTATUS_CAMERA_RUNNING);
-//        }
     }
 
     private void updateActivityOrientation() {
@@ -691,8 +671,9 @@ public class StoryScanActivity extends Activity {
     }
 
 
-    public void targetFound(int targetID){
+    public synchronized void targetFound(int targetID){
         Log.d(TAG, "inTargetFound");
+
         String targetType = translateTarget(targetID);
         int storyID = -1;
         int listIndex;
@@ -714,19 +695,15 @@ public class StoryScanActivity extends Activity {
             }
         }
 
-        //Now pause the app
-        updateApplicationStatus(APPSTATUS_CAMERA_STOPPED);
-        // QCAR-specific pause operation
-        QCAR.onPause();
+        assert storyID != -1;
 
-        if (storyID != -1){
-            Bundle args = getData(String.valueOf(storyID));
 
-            Log.d(TAG, "inResultFound");
-            Intent detailIntent = new Intent(this, Story.class);
-            detailIntent.putExtras(args);
-            startActivity(detailIntent);
-        }
+        Bundle args = getData(String.valueOf(storyID));
+
+        Log.d(TAG, "inResultFound");
+        Intent detailIntent = new Intent(this, Story.class);
+        detailIntent.putExtras(args);
+        startActivity(detailIntent);
     }
 
     private String translateTarget(int targetID){
@@ -749,6 +726,7 @@ public class StoryScanActivity extends Activity {
         Bundle args = new Bundle();
         String projection[] = { StoriesDatabase.StoryEntry._ID,
                 StoriesDatabase.StoryEntry.COLUMN_AUTHOR_SURNAME,
+                StoriesDatabase.StoryEntry.COLUMN_AUTHOR_NAME,
                 StoriesDatabase.StoryEntry.COLUMN_TITLE,
                 StoriesDatabase.StoryEntry.COLUMN_REMOTE_TEXT,
                 StoriesDatabase.StoryEntry.COLUMN_LOCAL_TEXT,
@@ -771,6 +749,8 @@ public class StoryScanActivity extends Activity {
                     storyCursor.getColumnIndex(StoriesDatabase.StoryEntry._ID));
             args.putString(Story.ARG_STORY_ID, storyID);
             String storyAuthor = storyCursor.getString(
+                    storyCursor.getColumnIndex(StoriesDatabase.StoryEntry.COLUMN_AUTHOR_NAME)) +
+                    " " + storyCursor.getString(
                     storyCursor.getColumnIndex(StoriesDatabase.StoryEntry.COLUMN_AUTHOR_SURNAME));
             args.putString(Story.ARG_STORY_AUTHOR, storyAuthor);
 

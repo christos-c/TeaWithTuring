@@ -34,7 +34,7 @@ public class Story extends Activity {
 
     protected static String mStoryID;
     protected static String mStoryTitle, mTextURL, mTextLocal, mAudioURL, mAudioLocal,
-            mVideoURL, mVideoLocal, mEssayURL, mEssayLocal, mBioURL, mBioLocal;
+            mVideoURL, mVideoLocal, mEssayURL, mEssayLocal, mBioURL, mBioLocal, mStoryAuthor;
 
     /**
      * The integers corresponding to the different tabs of the story
@@ -51,6 +51,7 @@ public class Story extends Activity {
         super.onCreate(savedInstanceState);
         mStoryID = getData(ARG_STORY_ID, savedInstanceState);
         mStoryTitle = getData(ARG_STORY_TITLE, savedInstanceState);
+        mStoryAuthor = getData(ARG_STORY_AUTHOR, savedInstanceState);
         mTextLocal = getData(ARG_TEXT_LOCAL, savedInstanceState);
         mTextURL = getData(ARG_TEXT_URL, savedInstanceState);
         mAudioURL = getData(ARG_AUDIO_URL, savedInstanceState);
@@ -62,7 +63,9 @@ public class Story extends Activity {
         mBioURL = getData(ARG_BIO_URL, savedInstanceState);
         mBioLocal = getData(ARG_BIO_LOCAL, savedInstanceState);
 
-        setTitle(mStoryTitle);
+        ActionBar ab = getActionBar();
+        ab.setTitle(mStoryTitle);
+        ab.setSubtitle("by " + mStoryAuthor);
 
         // Check which tabs should be active
         List<Integer> activeTabs = new ArrayList<Integer>();

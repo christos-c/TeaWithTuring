@@ -48,6 +48,7 @@ public class StoryAudioFragment extends Fragment {
     private Handler handler = new Handler();
 
     private Player player;
+    private Downloader downloader;
 
     private Bundle savedState = null;
 
@@ -102,6 +103,8 @@ public class StoryAudioFragment extends Fragment {
         buttonDownload.setOnClickListener(downloadListener);
         if (Story.mAudioLocal != null)
             buttonDownload.setVisibility(View.GONE);
+        else
+            buttonDownload.getDrawable().setAlpha(255);
 
         seekBarProgress = (SeekBar)rootView.findViewById(R.id.seekBar);
         seekBarProgress.setMax(99);
@@ -126,14 +129,21 @@ public class StoryAudioFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
-//        if (mediaPlayer.isPlaying())
-//            mediaPlayer.pause();
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         savedState = new Bundle();
+        if (player != null) player.cancel(true);
+        if (downloader != null) {
+            downloader.cancel(true);
+            NotificationManager mNotificationManager = (NotificationManager) getActivity().
+                    getSystemService(Context.NOTIFICATION_SERVICE);
+            mNotificationManager.cancel(mNotificationId);
+            Toast.makeText(getActivity(), getString(R.string.download_cancel_msg),
+                    Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
@@ -147,25 +157,6 @@ public class StoryAudioFragment extends Fragment {
                         .setSmallIcon(R.drawable.ic_action_download_notification)
                         .setContentTitle("Take Tea With Turing")
                         .setContentText("Downloading audio from story: " + Story.mStoryTitle);
-        // Creates an explicit intent for an Activity in your app
-//        Intent resultIntent = new Intent(getActivity(), StoryList.class);
-
-//        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-//            // The stack builder object will contain an artificial back stack for the
-//            // started Activity.
-//            // This ensures that navigating backward from the Activity leads out of
-//            // your application to the Home screen.
-//            TaskStackBuilder stackBuilder = TaskStackBuilder.create(getActivity());
-//            // Adds the back stack for the Intent (but not the Intent itself)
-//            stackBuilder.addParentStack(StoryList.class);
-//            // Adds the Intent that starts the Activity to the top of the stack
-//            stackBuilder.addNextIntent(resultIntent);
-//            PendingIntent resultPendingIntent =
-//                    stackBuilder.getPendingIntent(0,
-//                            PendingIntent.FLAG_UPDATE_CURRENT
-//                    );
-//            mBuilder.setContentIntent(resultPendingIntent);
-//        }
 
         NotificationManager mNotificationManager = (NotificationManager) getActivity().
                 getSystemService(Context.NOTIFICATION_SERVICE);
@@ -180,8 +171,8 @@ public class StoryAudioFragment extends Fragment {
             super.onPreExecute();
             progressDialog = new ProgressDialog(getActivity());
             progressDialog.setMessage("Loading audio...");
-            progressDialog.setCancelable(false);
-            progressDialog.setIndeterminate(true);
+//            progressDialog.setCancelable(false);
+//            progressDialog.setIndeterminate(true);
             progressDialog.show();
         }
 
@@ -297,7 +288,8 @@ public class StoryAudioFragment extends Fragment {
         @Override
         public void onClick(View v){
             buttonDownload.setEnabled(false);
-            new Downloader().execute(Story.mAudioURL);
+            downloader = new Downloader();
+            downloader.execute(Story.mAudioURL);
         }
     };
 

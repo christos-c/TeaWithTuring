@@ -3,7 +3,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:0.9.+'
+        classpath 'com.android.tools.build:gradle:1.5.0'
     }
 }
 apply plugin: 'android'
@@ -16,32 +16,45 @@ android {
     compileSdkVersion 19
     buildToolsVersion '19'
 
+    signingConfigs {
+        myConfig {
+            storeFile file("keystore.jks")
+            keyAlias "Main Key"
+            storePassword "makk3yst0r314"
+            keyPassword "makk3y14"
+        }
+    }
+
     defaultConfig {
-        minSdkVersion 14
+        minSdkVersion 15
         targetSdkVersion 19
     }
     buildTypes {
         release {
-            runProguard true
-            proguardFile getDefaultProguardFile('proguard-android-optimize.txt')
+            runProguard false
+//            proguardFile 'proguard-rules.txt'
+            signingConfig signingConfigs.myConfig
         }
     }
 }
 
 dependencies {
-    compile files('libs/QCAR.jar')
-    compile files('libs/armeabi-v7a.jar')
+    //    compile files('lib/*.jar')
     compile files('libs/armeabi.jar')
+    compile files('libs/armeabi-v7a.jar')
+    compile files('libs/QCAR.jar')
+    //    compile files('lib/armeabi.jar','lib/armeabi-v7a.jar','lib/QCAR.jar')
+//    compile fileTree(dir: 'libs', include: ['*.jar'])
 }
 
-task nativeLibsToJar(type: Zip, description: 'create a jar archive of the native libs') {
-    destinationDir file("$buildDir/native-libs")
-    baseName 'native-libs'
-    extension 'jar'
-    from fileTree(dir: 'libs', include: '**/*.so')
-    into 'lib/'
-}
+//task nativeLibsToJar(type: Zip, description: 'create a jar archive of the native libs') {
+//    destinationDir file("$buildDir/native-libs")
+//    baseName 'native-libs'
+//    extension 'jar'
+//    from fileTree(dir: 'libs', include: '**/*.so')
+//    into 'lib/'
+//}
 
-tasks.withType(Compile) {
-    compileTask -> compileTask.dependsOn(nativeLibsToJar)
-}
+//tasks.withType(Compile) {
+//    compileTask -> compileTask.dependsOn(nativeLibsToJar)
+//}

@@ -28,7 +28,6 @@ public class StoryVideoFragment extends Fragment {
     private Bundle savedState = null;
 
     private static String tag = "INFO-VIDEO";
-    private View rootView;
 
     /**
      * Callback interface through which the fragment will report the
@@ -69,7 +68,7 @@ public class StoryVideoFragment extends Fragment {
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        rootView = inflater.inflate(R.layout.fragment_story_video, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_story_video, container, false);
         assert rootView != null;
 
         if (StoryAudioFragment.mediaPlayer != null && StoryAudioFragment.mediaPlayer.isPlaying())
@@ -104,6 +103,7 @@ public class StoryVideoFragment extends Fragment {
         mMediaController.hide();
         savedState = new Bundle();
         savedState.putInt("videoPos", videoView.getCurrentPosition());
+        if (player != null) player.cancel(true);
     }
 
     @Override
@@ -140,7 +140,7 @@ public class StoryVideoFragment extends Fragment {
             progressDialog = new ProgressDialog(getActivity());
 //            progressDialog.setTitle("Story Video");
             progressDialog.setMessage("Loading video...");
-            progressDialog.setCancelable(false);
+//            progressDialog.setCancelable(false);
             progressDialog.setIndeterminate(true);
             progressDialog.show();
             videoView.setVisibility(View.GONE);
@@ -150,13 +150,8 @@ public class StoryVideoFragment extends Fragment {
         protected Boolean doInBackground(String... urls) {
             Boolean prepared;
             try {
-                if (urls[1] != null){
-                    // TODO Read from local file
-                }
-                else {
-                    Log.d(tag, "Loading from "+urls[0]);
-                    videoView.setVideoPath(urls[0]);
-                }
+                Log.d(tag, "Loading from "+urls[0]);
+                videoView.setVideoPath(urls[0]);
                 prepared = true;
             } catch (IllegalArgumentException e) {
                 Log.d("IllegalArgument", e.getMessage());

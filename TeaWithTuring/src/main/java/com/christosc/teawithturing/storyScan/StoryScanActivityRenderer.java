@@ -10,6 +10,7 @@ import javax.microedition.khronos.opengles.GL10;
 
 public class StoryScanActivityRenderer implements GLSurfaceView.Renderer {
     public boolean mIsActive = false;
+    private boolean mTargetFound = false;
 
     /** Reference to main activity */
     public StoryScanActivity mActivity;
@@ -57,7 +58,8 @@ public class StoryScanActivityRenderer implements GLSurfaceView.Renderer {
 
         // Call our native function to render content
         int target = renderFrame();
-        if (target > -1 && target < 4) {
+        if (!mTargetFound && target > -1 && target < 4) {
+            mTargetFound = true;
             Log.d(StoryScanActivity.TAG, "Target is "+target+", sending to StoryScanActivity");
             mActivity.targetFound(target);
         }

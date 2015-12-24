@@ -6,6 +6,7 @@ import android.content.ContentResolver;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -43,12 +44,22 @@ public class StoryList extends ListActivity implements LoaderManager.LoaderCallb
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        final String PREFS_NAME = "MyPrefsFile";
+
+        SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+
+        if (settings.getBoolean("my_first_time", true)) {
+            // the app is being launched for first time, do something
+            // record the fact that the app has been started at least once
+            settings.edit().putBoolean("my_first_time", false).commit();
+
+            // first time task
+            Intent i = new Intent(this, AboutActivity.class);
+            startActivity(i);
+        }
+
         if (savedInstance != null) savedInstanceState = savedInstance;
-        //TODO Modify this accordingly (add it to Story.java)
-//        View showcasedView = findViewById(android.R.id.content);
-//        ViewTarget target = new ViewTarget(showcasedView);
-//        ShowcaseView.insertShowcaseView(target, this,
-//                R.string.showcase_title, R.string.showcase_message);
 
         // We'll need these for the sorting function
         list = getListView();
@@ -176,6 +187,7 @@ public class StoryList extends ListActivity implements LoaderManager.LoaderCallb
         Bundle args = new Bundle();
         String projection[] = { StoriesDatabase.StoryEntry._ID,
                 StoriesDatabase.StoryEntry.COLUMN_AUTHOR_SURNAME,
+                StoriesDatabase.StoryEntry.COLUMN_AUTHOR_NAME,
                 StoriesDatabase.StoryEntry.COLUMN_TITLE,
                 StoriesDatabase.StoryEntry.COLUMN_REMOTE_TEXT,
                 StoriesDatabase.StoryEntry.COLUMN_LOCAL_TEXT,
@@ -198,6 +210,8 @@ public class StoryList extends ListActivity implements LoaderManager.LoaderCallb
                     storyCursor.getColumnIndex(StoriesDatabase.StoryEntry._ID));
             args.putString(Story.ARG_STORY_ID, storyID);
             String storyAuthor = storyCursor.getString(
+                    storyCursor.getColumnIndex(StoriesDatabase.StoryEntry.COLUMN_AUTHOR_NAME)) +
+                    " " + storyCursor.getString(
                     storyCursor.getColumnIndex(StoriesDatabase.StoryEntry.COLUMN_AUTHOR_SURNAME));
             args.putString(Story.ARG_STORY_AUTHOR, storyAuthor);
 

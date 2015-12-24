@@ -12,6 +12,7 @@
     <string name="action_list">Tea With Turing - Story List</string>
     <string name="action_sort">Sort Stories</string>
     <string name="action_about">About</string>
+    <string name="story_by">by</string>
 
     <string name="title_story_audio">Audio</string>
     <string name="button_start">Start</string>
@@ -20,8 +21,6 @@
     <string name="image_descriptor_download">Download Audio</string>
 
     <string name="activity_scan">Scan Story Marker</string>
-    <string name="showcase_title">Tutorial</string>
-    <string name="showcase_message">This is a demo message for the tutorial</string>
 
     <string name="button_sort_by_name">Sort by author name</string>
     <string name="button_sort_by_title">Sort by title</string>
@@ -29,5 +28,6 @@
 
     <string name="message_audio_only">AUDIO ONLY</string>
     <string name="download_complete_msg">Audio download complete</string>
+    <string name="download_cancel_msg">Audio download cancelled</string>
 
 </resources>
